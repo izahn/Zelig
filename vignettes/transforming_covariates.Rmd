@@ -24,52 +24,34 @@ For convenience, you may wish to transform one or more of your covariates within
 library(zeligverse)
 library(dplyr)
 
-z.log <- zelig(speed ~ log(dist), data = cars, model = 'ls', cite = FALSE)
+z.log <- lm(speed ~ log(dist), data = cars)
 ```
 
 Then we want to find quantities of interest when the `dist` variable is 26 to
-56 (the first to third quartile). To do this we added the logged fitted values
-to `setx`, simulate quantities of interest, and plot the results:
+56 (the first to third quartile):
 
 ```{r}
-setx(z.log, dist = log(26:56)) %>%
-    sim() %>%
-    plot(xlab = 'dist (log)')
+zef <- Effect("dist", z.log, xlevels = list(dist = 26:50))
+as.data.frame(zef)
+
+lsmeans(z.log, "dist", at = list(dist = 26:50))
 ```
 
 We could also estimate the model with `dist` as a polynomial. For example:
 
 ```{r message=FALSE}
 # Find range of polynomial values
-dist_range <- min(cars$dist):max(cars$dist)
-
-zelig(speed ~ dist + I(dist^2), data = cars, model = 'ls',
-      cite = FALSE) %>%
-    setx(dist = dist_range) %>%
-    sim() %>%
+lm(speed ~ poly(dist, 2), data = cars) %>%
+    Effect(focal.predictors = "dist") %>%
     plot()
 ```
 
-## Splines
-
-The ability to transform covariates with splines in the `zelig` model formula and then set/simulate
-quantities of interest is currently in development. In the meantime. You can transform the covariates outside of the `zelig` model estimation call. For example, we can include splines for `dist` in the following way:
+Splines and other transformations should generally work as expected.
 
 ```{r, message=FALSE}
 library(splines)
-cars.splines <- cbind(cars, bs(cars$dist))
-names(cars.splines)[3:5] <- c('dist_bs_1', 'dist_bs_2', 'dist_bs_3')
 
-zelig(speed ~ dist_bs_1 + dist_bs_2 + dist_bs_3, data = cars.splines,
-      model = 'ls', cite = FALSE) %>%
-    setx(dist_bs_1 = c(min(cars.splines$dist_bs_1), median(cars.splines$dist_bs_1),
-                       max(cars.splines$dist_bs_2)),
-         dist_bs_2 = c(min(cars.splines$dist_bs_2), median(cars.splines$dist_bs_2),
-                       max(cars.splines$dist_bs_2)),
-         dist_bs_3 = c(min(cars.splines$dist_bs_3), median(cars.splines$dist_bs_3),
-                       max(cars.splines$dist_bs_3))) %>%
-    sim() %>%
+lm(speed ~ bs(dist, df = 4), data = cars) %>%
+    Effect(focal.predictors = "dist") %>%
     plot()
 ```
-
-Note that this example was for syntax illustration purposes only. You probably want to use a more continuous range of values for the splines. Make sure that you have an equal number of fitted values for each component of the spline and that these are all in the same order.

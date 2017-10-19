@@ -28,30 +28,29 @@ Average Treatment Effects on the Treated
 
 Sometimes the quantity of interest you are interested in is the average effect of some treatment on the group of individuals that received treatment (as opposed to, for example, the effect of the treatment averaged across all individuals in a study regardless of whether or not they received the treatment). 
 
-Average Treatment Effects on the Treated (ATT) quantities of interest can be generated with the `ATT()` function (or the identically named [Zelig 5 method](zelig5_vs_zelig4.html)), for any `zelig` model that can construct expected values. Once you have simulated the ATT, they can be retrieved with the QI 
-[getters](getters.html) function: `get_qi()`. For example: 
+The tools available in R for calculating treatment effects leave a lot to be desired. For example: 
 
 ```{r message=FALSE}
-library(zeligverse)
-library(dplyr) # load %>% pipe operator
+library(dplyr)
 
 # load data and estimate model
-data(sanction)
-zqi.out <- zelig(num ~ target + coop + mil, 
-                 model = "poisson", data = sanction, cite = FALSE)
+data(sanction, package = "Zelig")
 
-# find the ATT where the treatement is mil = 1
-z.att <- zqi.out %>%
-             ATT(treatment = "mil", treat = 1) %>% 
-             get_qi(qi = "ATT", xvalue = "TE")
+m <- glm(num ~ target + coop + mil, family = "poisson", data = sanction)
 
-# summarize the results
-hist(z.att, 
-     main = NULL,
-     xlab ="Averege Treatment Effect of mil on the Treated")
+actual <- predict(m,
+                  newdata = filter(sanction, mil == 1),
+                  type = "response")
+cfact <- predict(m,
+                 newdata = mutate(filter(sanction, mil == 1), mil = 0),
+                 type = "response")
+mean(actual - cfact)
+
 ```
 
 In this example the treatment variable was `mil`. Units were denoted as treated when `mil = 1`. `qi = "ATT", xvalue = "TE"` specifies that we would like to extrat the ATT quantity of interest.
+
+Note that estimating the value is not too bad, but we have no estimate of uncertainty. 
 
 Background
 ==========

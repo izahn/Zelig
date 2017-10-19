@@ -27,23 +27,6 @@ options(cite = FALSE)
 
 Autoregressive and Moving-Average Models with Integration for Time-Series Data
 
-Syntax
-------
-
-```{r, eval = FALSE}
-z.out <- zarima$new()
-z.out$zelig(Y ~ X1 + X2, order = c(1, 0, 0), data = mydata)
-x.out$setx(z.out)
-s.out$sim(z.out)
-```
-
-### Additional Inputs
-
-Zelig accepts the following additional inputs for `arima` to specify variables that provide the time index and any cross-sectional element if there are multiple time-series in the same dataset:
-
--   `ts`: Name of a variable that denotes the time element of the data.  As a variable name, this should be in quotes.  If this is not provided, Zelig will assume that the data is already ordered by time, but if provided, the dataset will be sorted by this variable before estimation.
-
--   `cs`: Name of a variable that denotes the cross-sectional element of the data, for example, country name in a dataset with time-series across different countries.  As a variable name, this should be in quotes.  If this is not provided, Zelig will assume that all observations come from the same unit over time, and should be pooled, but if provided, individual models will be run in each cross-section.  If `cs` is given as an argument, `ts` must also be provided.
 
 Examples
 ------
@@ -59,6 +42,7 @@ set.seed(1234)
 Attach sample data, which has left party seat share and unemployment across time in several countries.  We will subset to just those observations from the United Kingdom:
 
 ```{r, eval = TRUE}
+library(forecast)
 data(seatshare)
 subset <- seatshare[seatshare$country == "UNITED KINGDOM",]
 ```
@@ -66,21 +50,27 @@ subset <- seatshare[seatshare$country == "UNITED KINGDOM",]
 Estimate model:
 
 ```{r, eval = TRUE}
-ts.out <- zelig(unemp ~ leftseat, model = 'arima', order = c(1, 0, 1), data = subset)
+ts.out <- zarima$new()
+ts.out$zelig(unemp ~ leftseat, order = c(1, 0, 1), data = subset)
+
+subset$unemp <- with(subset, ts(unemp, start = min(year), end = max(year)))
+tsm <- with(subset, Arima(unemp, xreg = leftseat, order = c(1, 0, 1)))
 ```
 
 Summarize estimated model parameters:
 
 ```{r, eval = TRUE}
-summary(ts.out)
+summary(tsm)
 ```
 
 Next we simulate what happens when leftseat share drops from a moderately high level of 75 percent, to a rather low level of 25 percent:
 
-```{r, eval = TRUE, echo=FALSE}
-ts.out <- setx(ts.out, leftseat = 0.75)
-ts.out <- setx1(ts.out, leftseat = 0.25)
-ts.out <- sim(ts.out)
+```{r, eval = TRUE}
+tsm.ls75 <- forecast(tsm, xreg = rep(0.75, 10))
+tsm.ls25 <- forecast(tsm, xreg = rep(0.25, 10))
+
+plot(tsm.ls75, main = "leftseat = 0.75")
+plot(tsm.ls25, main = "leftseat = 0.25")
 ```
 
 ```{r Zelig-arima, dev=c("png", "pdf"), eval = TRUE, fig.cap = "Graphs of Quantities of Interest for ARIMA models"}
@@ -93,30 +83,39 @@ AR (Autoregressive) and MA (Moving Average) models are commonly used in time ser
 
 #### AR
 ```{r, eval=FALSE}
-ts.out <- zelig(unemp ~ leftseat, model = "arima", order = c(1, 0, 0), data = subset)
-```
-#### MA
-```{r, eval=FALSE}
-ts.out <- zelig(unemp ~ leftseat, model = "arima", order = c(0, 0, 1), data = subset)
+tsm2 <- with(subset, Arima(unemp, xreg = leftseat, order = c(1, 0, 0)))
+summary(tsm2)
 ```
 
+#### MA
+```{r, eval=FALSE}
+tsm3 <- with(subset, Arima(unemp, xreg = leftseat, order = c(0, 0, 1)))
+```
+
+### ARIMA
+The forecast package can help you choose an auto-regressive structure.
+
+```{r}
+tsm4 <- with(subset, auto.arima(unemp, xreg = leftseat))
+
+tsm4.ls75 <- forecast(tsm4, xreg = rep(0.75, 10))
+tsm4.ls25 <- forecast(tsm4, xreg = rep(0.25, 10))
+
+plot(tsm4.ls75, main = "leftseat = 0.75")
+plot(tsm4.ls25, main = "leftseat = 0.25")
+```
 
 ### Multiple Series
 
 The dataset contains similar series for 11 different OECD countries, and we could run the same model on each country's data.  Here we need to specify the `ts` and `cs` arguments to identify the names of variables that give the time and cross-section of each observation in the dataset
 
 ```{r, eval = TRUE}
-ts.out2 <- zelig(unemp ~ leftseat, model="arima", order = c(1,0,1), ts = "year",
-              cs = "country", data = seatshare)
-summary(ts.out2)
-```
+library(purrr)
 
-See Also
-------
+seatshare <- split(seatshare, seatshare$country)
+seatshare <- map(seatshare, ~ transform(., unemp = ts(unemp, start = min(year), end = max(year))))
 
-The estimator used for ARIMA models is part of the stats package by William N. Venables and Brian D. Ripley .In addition, advanced users may wish to refer to `help(arima)`.
+tsm.all <- map(seatshare, ~ with(., Arima(unemp, xreg = leftseat, order = c(0, 0, 1))))
 
-```{r, eval = TRUE, echo=FALSE, results = "asis"}
-z5 <- zarima$new()
-z5$references()
+map(tsm.all, summary)
 ```

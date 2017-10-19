@@ -1,5 +1,5 @@
 ---
-title: "Using Zelig with Amelia"
+title: "Using Amelia"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -23,49 +23,34 @@ options(cite = FALSE)
 ```
 ---
 
-`zelig()` accepts multiply imputed data output objects from the [Amelia](http://gking.harvard.edu/amelia) package as the `data` argument.
-
-```{r, eval = TRUE, echo = FALSE}
-suppressWarnings(suppressMessages(library(Zelig)))
-suppressWarnings(suppressMessages(library(methods)))
-set.seed(1234)
-```
 
 First, using the Amelia package, we multiply impute a dataset with missing values:
 
 ```{r, eval = TRUE}
+library(purrr)
 library("Amelia")
+
 data(africa)
 a.out <- amelia(x = africa, cs = "country", ts = "year", logs = "gdp_pc")
 ```
 
-Then we can use the output object from the Amelia package directly in the data
-argument for Zelig:
+Then we can use the output object from the Amelia package to fit a list of models:
 
 ```{r, eval = TRUE}
-z.out <- zelig(gdp_pc ~ trade + civlib, model = "ls", data = a.out)
+models <- map(a.out$imputations, ~ lm(gdp_pc ~ trade + civlib, data = .))
 ```
 
-Zelig will automatically extract the imputed datasets from the Amelia object, and run the requested model in each of them.  When the estimated model parameters are summarized, the results from each imputed dataset are available, but more importantly, the combined answer across the imputed datasets calculated by "Rubin's Rules" are automatically presented:
+Amelia includes a `mi.meld` function that can be used to combine the results:
 
-```{r, eval = TRUE}
-summary(z.out)
+``{r}
+mi.meld(reduce(map(models, coef), rbind),
+        reduce(map(models, ~ coef(summary(.))[, "Std. Error"]), rbind))
 ```
 
-To see the result from an individual imputed dataset, we use the subset argument as:
+Nicer output is available from several of the available multiple-imputation packages in R, including the *mice* and *mitools*.
 
-```{r, eval = TRUE}
-summary(z.out, subset = 2:3)
+```{r}
+library(mice)
+foo <- summary(pool(as.mira(models)))
 ```
-
-When quantities of interest are plotted, such as expected and predicted values and first differenences, these are correctly pooled across those from each of the m imputed datasets:
-
-```{r, eval = TRUE, fig.cap = ""}
-z.out$setx()
-z.out$sim()
-plot(z.out)
-```
-
-## Other multiply imputed data
-
-Zelig also includes a function called `from_zelig_model()` to conform multiply imputed data sets from other sources to a form that `zelig` can use.
+## TODO: quantities of interest for MI
