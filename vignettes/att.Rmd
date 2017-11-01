@@ -38,20 +38,26 @@ data(sanction, package = "Zelig")
 
 m <- glm(num ~ target + coop + mil, family = "poisson", data = sanction)
 
-actual <- predict(m,
-                  newdata = filter(sanction, mil == 1),
-                  type = "response")
-cfact <- predict(m,
-                 newdata = mutate(filter(sanction, mil == 1), mil = 0),
-                 type = "response")
-mean(actual - cfact)
+treated <- filter(sanction, mil == 1)
+treated <- rbind(treated, mutate(treated, mil = 0))
 
+pred <- data.frame(treated,
+                   predict(m,
+                           newdata = treated,
+                           type = "response",
+                           se = TRUE))
+summarise(group_by(pred, mil), fitted = mean(fit), se = mean(se.fit))
 ```
 
-In this example the treatment variable was `mil`. Units were denoted as treated when `mil = 1`. `qi = "ATT", xvalue = "TE"` specifies that we would like to extrat the ATT quantity of interest.
+Alternatively:
+```{r}
+library(margins)
 
-Note that estimating the value is not too bad, but we have no estimate of uncertainty. 
+pred <- prediction(m, data = filter(sanction, mil == 1), at = list(mil = c(0, 1)))
+summarise(group_by(pred, mil), fitted = mean(fitted), se = mean(se.fitted))
+```
 
+In this example the treatment variable was `mil`. Units were denoted as treated when `mil = 1`.
 Background
 ==========
 
