@@ -106,6 +106,7 @@ Load the data and estimate the model:
 
 ```{r, eval = TRUE}
 data(sanction)
+library(VGAM)
 
 vgam.out1 <- vglm(cbind(import, export) ~ coop + cost + target,
                   family = binomialff(multiple.responses = TRUE, link = "probit"),
