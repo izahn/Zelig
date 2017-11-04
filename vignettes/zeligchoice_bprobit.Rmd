@@ -106,43 +106,38 @@ Load the data and estimate the model:
 
 ```{r, eval = TRUE}
 data(sanction)
+
+vgam.out1 <- vglm(cbind(import, export) ~ coop + cost + target,
+                  family = binomialff(multiple.responses = TRUE, link = "probit"),
+                  data = sanction)
 ```
+
+Estimate two effect parameters for each explanatory variable in
+addition to the correlation coefficient; this formulation is
+parametrically independent (estimating unconstrained effects for each
+explanatory variable), but stochastically dependent because the models
+share a correlation parameter. Generate baseline values for the
+explanatory variables (with cost set to 1, net gain to sender) and
+alternative values (with cost set to 4, major loss to sender):
 
 ```{r, eval = TRUE}
-z.out1 <- zelig(cbind(import, export) ~ coop + cost + target,
-                model = "bprobit", data = sanction)
-summary(z.out1)
+library(dplyr)
+
+sanctions.grid <- rbind(mutate(sanction, cost = 1),
+                        mutate(sanction, cost = 4))
+
+pred <- predict(vgam.out1, newdata = sanctions.grid,
+                type = "response")
+
+pred <- data.frame(sanctions.grid,
+                   import = mean(pred[, 1]),
+                   export = mean(pred[, 2]))
+
+summarize(group_by(pred, cost),
+          import = mean(import),
+          export = mean(export))
+
 ```
-
-By default, `zelig()` estimates two effect parameters for each
-explanatory variable in addition to the correlation coefficient; this
-formulation is parametrically independent (estimating unconstrained
-effects for each explanatory variable), but stochastically dependent
-because the models share a correlation parameter. Generate baseline
-values for the explanatory variables (with cost set to 1, net gain to
-sender) and alternative values (with cost set to 4, major loss to
-sender):
-
-```{r, eval = TRUE}
-x.low <- setx(z.out1, cost = 1)
-x.high <- setx(z.out1, cost = 4)
-```
-
-Simulate fitted values and first differences:
-
-```{r, eval = TRUE}
-s.out1 <- sim(z.out1, x = x.low, x1 = x.high)
-```
-
-```{r, eval = TRUE}
-summary(s.out1)
-```
-
-```{r Zelig-bprobit1, dev=c("png", "pdf"), eval = TRUE, fig.cap = "Graphs of Quantities of Interest for Bivariate Probit"}
-plot(s.out1)
-```
-
-
 
 Model
 ------
