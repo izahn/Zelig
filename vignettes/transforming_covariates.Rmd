@@ -28,6 +28,9 @@ Then we want to find quantities of interest when the `dist` variable is 26 to
 56 (the first to third quartile):
 
 ```{r}
+library(effects)
+library(lsmeans)
+
 zef <- Effect("dist", z.log, xlevels = list(dist = 26:50))
 as.data.frame(zef)
 
@@ -38,6 +41,7 @@ We could also estimate the model with `dist` as a polynomial. For example:
 
 ```{r message=FALSE}
 # Find range of polynomial values
+library(magrittr)
 lm(speed ~ poly(dist, 2), data = cars) %>%
     Effect(focal.predictors = "dist") %>%
     plot()
