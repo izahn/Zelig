@@ -73,10 +73,6 @@ plot(tsm.ls75, main = "leftseat = 0.75")
 plot(tsm.ls25, main = "leftseat = 0.25")
 ```
 
-```{r Zelig-arima, dev=c("png", "pdf"), eval = TRUE, fig.cap = "Graphs of Quantities of Interest for ARIMA models"}
-plot(ts.out)
-```
-
 ### AR and MA Models
 
 AR (Autoregressive) and MA (Moving Average) models are commonly used in time series analysis. As both AR and MA models are special cases of ARIMA models they are not implemented as separate models within Zelig. Specification of AR and MA models can be accomplished by changing the value of the `order` parameter within the ARIMA model.
