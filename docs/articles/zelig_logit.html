@@ -123,13 +123,13 @@
     <div class="page-header toc-ignore">
       <h1>Logistic Regression</h1>
             
-            <h4 class="date">2017-10-29</h4>
+            <h4 class="date">2017-11-03</h4>
           </div>
 
     
     
 <div class="contents">
-<p><em>Built using Zelig version 5.1.4.90000</em></p>
+<p><em>Built using Zelig version 5.1.4</em></p>
 <p>Logistic Regression for Dichotomous Dependent Variables with <code>logit</code>.</p>
 <p>Logistic regression specifies a dichotomous dependent variable as a function of a set of explanatory variables.</p>
 <div id="syntax" class="section level2">
@@ -191,9 +191,9 @@ s.out &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sim.h
 ## 
 ## Coefficients:
 ##             Estimate (OR) Std. Error (OR) z value Pr(&gt;|z|)    
-## (Intercept)      1.039111        0.183840   0.217 0.828325    
-## age              1.011327        0.003088   3.689 0.000225 ***
-## racewhite        1.907038        0.256462   4.800 1.58e-06 ***
+## (Intercept)         1.039           1.194   0.217 0.828325    
+## age                 1.011           1.003   3.689 0.000225 ***
+## racewhite           1.907           1.144   4.800 1.58e-06 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -213,11 +213,11 @@ s.out &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sim.h
 ##  sim x :
 ##  -----
 ## ev
-##           mean         sd       50%      2.5%    97.5%
-## [1,] 0.7480293 0.01184826 0.7480691 0.7247761 0.770409
+##           mean         sd       50%      2.5%     97.5%
+## [1,] 0.7478112 0.01154507 0.7480927 0.7235682 0.7697535
 ## pv
 ##          0     1
-## [1,] 0.241 0.759</code></pre>
+## [1,] 0.259 0.741</code></pre>
 <p>Show the results graphically:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(s.out1)</code></pre></div>
 <p><img src="zelig_logit_files/figure-html/unnamed-chunk-8-1.png" width="672"></p>
@@ -237,23 +237,23 @@ s.out2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sim.
 ##  sim x :
 ##  -----
 ## ev
-##           mean        sd       50%     2.5%     97.5%
-## [1,] 0.8225489 0.0102722 0.8231589 0.800891 0.8410317
+##           mean         sd       50%      2.5%     97.5%
+## [1,] 0.8228993 0.01053704 0.8230036 0.8020568 0.8430557
 ## pv
 ##          0     1
-## [1,] 0.171 0.829
+## [1,] 0.195 0.805
 ## 
 ##  sim x1 :
 ##  -----
 ## ev
-##          mean         sd       50%      2.5%     97.5%
-## [1,] 0.709653 0.01289457 0.7100321 0.6841094 0.7339456
+##           mean         sd       50%      2.5%     97.5%
+## [1,] 0.7088865 0.01304273 0.7090939 0.6826428 0.7338693
 ## pv
 ##          0     1
-## [1,] 0.304 0.696
+## [1,] 0.298 0.702
 ## fd
 ##            mean         sd        50%       2.5%       97.5%
-## [1,] -0.1128959 0.01129122 -0.1128903 -0.1350435 -0.09219569</code></pre>
+## [1,] -0.1140128 0.01180765 -0.1138535 -0.1361728 -0.09172282</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(s.out2)</code></pre></div>
 <p><img src="zelig_logit_files/figure-html/unnamed-chunk-10-1.png" width="672"></p>
 </div>

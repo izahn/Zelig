@@ -123,13 +123,13 @@
     <div class="page-header toc-ignore">
       <h1>Bivariate Probit</h1>
             
-            <h4 class="date">2017-10-29</h4>
+            <h4 class="date">2017-11-03</h4>
           </div>
 
     
     
 <div class="contents">
-<p><em>Built using Zelig version 5.1.4.90000</em></p>
+<p><em>Built using Zelig version 5.1.4</em></p>
 <hr>
 <p>Bivariate Probit Regression for Two Dichotomous Dependent Variables with <code>bprobit</code> from ZeligChoice.</p>
 <p>Use the bivariate probit regression model if you have two binary dependent variables <span class="math inline">\((Y_1, Y_2)\)</span>, and wish to model them jointly as a function of some explanatory variables. Each pair of dependent variables <span class="math inline">\((Y_{i1}, Y_{i2})\)</span> has four potential outcomes, <span class="math inline">\((Y_{i1}=1, Y_{i2}=1)\)</span>, <span class="math inline">\((Y_{i1}=1, Y_{i2}=0)\)</span>, <span class="math inline">\((Y_{i1}=0, Y_{i2}=1)\)</span>, and <span class="math inline">\((Y_{i1}=0, Y_{i2}=0)\)</span>. The joint probability for each of these four outcomes is modeled with three systematic components: the marginal Pr <span class="math inline">\((Y_{i1} = 1)\)</span> and Pr <span class="math inline">\((Y_{i2} = 1)\)</span>, and the correlation parameter <span class="math inline">\(\rho\)</span> for the two marginal distributions. Each of these systematic components may be modeled as functions of (possibly different) sets of explanatory variables.</p>
@@ -163,101 +163,54 @@ s.out &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sim.h
 <h3 class="hasAnchor">
 <a href="#basic-example-basic-bp" class="anchor"></a>Basic Example [basic.bp]</h3>
 <p>Load the data and estimate the model:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(sanction)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">z.out1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/zelig.html">zelig</a></span>(<span class="kw">cbind</span>(import, export) <span class="op">~</span><span class="st"> </span>coop <span class="op">+</span><span class="st"> </span>cost <span class="op">+</span><span class="st"> </span>target,
-                <span class="dt">model =</span> <span class="st">"bprobit"</span>, <span class="dt">data =</span> sanction)</code></pre></div>
-<pre><code>## How to cite this model in Zelig:
-##   Thomas W. Yee. 2007.
-##   bprobit: Bivariate Probit Regression for Dichotomous Dependent Variables
-##   in Christine Choirat, Christopher Gandrud, James Honaker, Kosuke Imai, Gary King, and Olivia Lau,
-##   "Zelig: Everyone's Statistical Software," http://zeligproject.org/</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(z.out1)</code></pre></div>
-<pre><code>## Model: 
-## 
-## Call:
-## z5$zelig(formula = cbind(import, export) ~ coop + cost + target, 
-##     data = sanction)
-## 
-## 
-## Pearson residuals:
-##                Min      1Q  Median     3Q   Max
-## probit(mu1) -2.164 -0.5307 -0.2526 0.4621 2.168
-## probit(mu2) -5.115 -0.5019  0.0590 0.6432 2.948
-## rhobit(rho) -2.172 -0.4182  0.1030 0.2874 4.296
-## 
-## Coefficients: 
-##               Estimate Std. Error z value Pr(&gt;|z|)
-## (Intercept):1 -1.71806    0.61883  -2.776  0.00550
-## (Intercept):2 -1.86625    0.60169  -3.102  0.00192
-## (Intercept):3 -0.38106    0.49828  -0.765  0.44443
-## coop:1         0.16794    0.20102   0.835  0.40347
-## coop:2        -0.02836    0.19841  -0.143  0.88634
-## cost:1         1.46870    0.36948   3.975 7.04e-05
-## cost:2         1.53177    0.37747   4.058 4.95e-05
-## target:1      -0.75222    0.27500  -2.735  0.00623
-## target:2      -0.28211    0.25531  -1.105  0.26918
-## 
-## Number of linear predictors:  3 
-## 
-## Names of linear predictors: probit(mu1), probit(mu2), rhobit(rho)
-## 
-## Log-likelihood: -72.0482 on 225 degrees of freedom
-## 
-## Number of iterations: 5 
-## Next step: Use 'setx' method</code></pre>
-<p>By default, <code><a href="../reference/zelig.html">zelig()</a></code> estimates two effect parameters for each explanatory variable in addition to the correlation coefficient; this formulation is parametrically independent (estimating unconstrained effects for each explanatory variable), but stochastically dependent because the models share a correlation parameter. Generate baseline values for the explanatory variables (with cost set to 1, net gain to sender) and alternative values (with cost set to 4, major loss to sender):</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x.low &lt;-<span class="st"> </span><span class="kw"><a href="../reference/setx.html">setx</a></span>(z.out1, <span class="dt">cost =</span> <span class="dv">1</span>)
-x.high &lt;-<span class="st"> </span><span class="kw"><a href="../reference/setx.html">setx</a></span>(z.out1, <span class="dt">cost =</span> <span class="dv">4</span>)</code></pre></div>
-<p>Simulate fitted values and first differences:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">s.out1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sim.html">sim</a></span>(z.out1, <span class="dt">x =</span> x.low, <span class="dt">x1 =</span> x.high)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(s.out1)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(sanction)
+<span class="kw">library</span>(VGAM)</code></pre></div>
+<pre><code>## Loading required package: stats4</code></pre>
+<pre><code>## Loading required package: splines</code></pre>
 <pre><code>## 
-##  sim x :
-##  -----
-## ev
-##                       mean          sd         50%         2.5%      97.5%
-## Pr(Y1=0, Y2=0) 0.764414729 0.081132438 0.777455707 5.840602e-01 0.89361936
-## Pr(Y1=0, Y2=1) 0.165326310 0.071943019 0.157151653 5.831875e-02 0.34341225
-## Pr(Y1=1, Y2=0) 0.062336183 0.043134762 0.050826223 1.036291e-02 0.17478426
-## Pr(Y1=1, Y2=1) 0.007922778 0.009676822 0.004710452 9.152771e-05 0.03701662
-## pv
-##                  0     1
-## (Y1=0, Y2=0) 0.212 0.788
-## (Y1=0, Y2=1) 0.859 0.141
-## (Y1=1, Y2=0) 0.937 0.063
-## (Y1=1, Y2=1) 0.992 0.008
+## Attaching package: 'VGAM'</code></pre>
+<pre><code>## The following object is masked from 'package:coda':
 ## 
-##  sim x1 :
-##  -----
-## ev
-##                        mean           sd          50%         2.5%
-## Pr(Y1=0, Y2=0) 1.609406e-05 0.0001060622 1.699806e-08 1.568597e-11
-## Pr(Y1=0, Y2=1) 1.477314e-02 0.0360107035 2.171428e-03 5.111826e-06
-## Pr(Y1=1, Y2=0) 3.348953e-03 0.0139152116 1.875177e-04 4.215531e-08
-## Pr(Y1=1, Y2=1) 9.818618e-01 0.0379522763 9.956782e-01 8.845988e-01
-##                       97.5%
-## Pr(Y1=0, Y2=0) 0.0001209118
-## Pr(Y1=0, Y2=1) 0.1069029540
-## Pr(Y1=1, Y2=0) 0.0248877996
-## Pr(Y1=1, Y2=1) 0.9999419810
-## pv
-##                  0     1
-## (Y1=0, Y2=0) 1.000 0.000
-## (Y1=0, Y2=1) 0.989 0.011
-## (Y1=1, Y2=0) 0.999 0.001
-## (Y1=1, Y2=1) 0.012 0.988
-## fd
-##                       mean         sd         50%       2.5%        97.5%
-## Pr(Y1=0, Y2=0) -0.76439863 0.08114943 -0.77745517 -0.8936194 -0.584056187
-## Pr(Y1=0, Y2=1) -0.15055317 0.08233919 -0.14431943 -0.3309139 -0.021439946
-## Pr(Y1=1, Y2=0) -0.05898723 0.04643810 -0.04941808 -0.1714881 -0.002845955
-## Pr(Y1=1, Y2=1)  0.97393904 0.04223666  0.98879594  0.8695511  0.999339537</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(s.out1)</code></pre></div>
-<div class="figure">
-<img src="zeligchoice_bprobit_files/figure-html/Zelig-bprobit1-1.png" alt="Graphs of Quantities of Interest for Bivariate Probit" width="672"><p class="caption">
-Graphs of Quantities of Interest for Bivariate Probit
-</p>
-</div>
+##     nvar</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vgam.out1 &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/VGAM/topics/vglm">vglm</a></span>(<span class="kw">cbind</span>(import, export) <span class="op">~</span><span class="st"> </span>coop <span class="op">+</span><span class="st"> </span>cost <span class="op">+</span><span class="st"> </span>target,
+                  <span class="dt">family =</span> <span class="kw"><a href="http://www.rdocumentation.org/packages/VGAM/topics/binomialff">binomialff</a></span>(<span class="dt">multiple.responses =</span> <span class="ot">TRUE</span>, <span class="dt">link =</span> <span class="st">"probit"</span>),
+                  <span class="dt">data =</span> sanction)</code></pre></div>
+<pre><code>## Warning in vglm.fitter(x = x, y = y, w = w, offset = offset, Xm2 = Xm2, :
+## iterations terminated because half-step sizes are very small</code></pre>
+<pre><code>## Warning in vglm.fitter(x = x, y = y, w = w, offset = offset, Xm2 =
+## Xm2, : some quantities such as z, residuals, SEs may be inaccurate due to
+## convergence at a half-step</code></pre>
+<p>Estimate two effect parameters for each explanatory variable in addition to the correlation coefficient; this formulation is parametrically independent (estimating unconstrained effects for each explanatory variable), but stochastically dependent because the models share a correlation parameter. Generate baseline values for the explanatory variables (with cost set to 1, net gain to sender) and alternative values (with cost set to 4, major loss to sender):</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)</code></pre></div>
+<pre><code>## 
+## Attaching package: 'dplyr'</code></pre>
+<pre><code>## The following object is masked from 'package:MASS':
+## 
+##     select</code></pre>
+<pre><code>## The following objects are masked from 'package:stats':
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sanctions.grid &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(sanction, <span class="dt">cost =</span> <span class="dv">1</span>),
+                        <span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(sanction, <span class="dt">cost =</span> <span class="dv">4</span>))
+
+pred &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/VGAM/topics/notdocumentedyet">predict</a></span>(vgam.out1, <span class="dt">newdata =</span> sanctions.grid,
+                <span class="dt">type =</span> <span class="st">"response"</span>)
+
+pred &lt;-<span class="st"> </span><span class="kw">data.frame</span>(sanctions.grid,
+                   <span class="dt">import =</span> <span class="kw">mean</span>(pred[, <span class="dv">1</span>]),
+                   <span class="dt">export =</span> <span class="kw">mean</span>(pred[, <span class="dv">2</span>]))
+
+<span class="kw"><a href="http://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span>(<span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(pred, cost),
+          <span class="dt">import =</span> <span class="kw">mean</span>(import),
+          <span class="dt">export =</span> <span class="kw">mean</span>(export))</code></pre></div>
+<pre><code>## # A tibble: 2 x 3
+##    cost    import    export
+##   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1     1 0.3717949 0.5384615
+## 2     4 0.3717949 0.5384615</code></pre>
 </div>
 </div>
 <div id="model" class="section level2">

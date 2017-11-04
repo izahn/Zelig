@@ -123,149 +123,56 @@
     <div class="page-header toc-ignore">
       <h1>Bootstraps</h1>
             
-            <h4 class="date">2017-10-29</h4>
+            <h4 class="date">2017-11-03</h4>
           </div>
 
     
     
 <div class="contents">
-<p><em>Built using Zelig version 5.1.4.90000</em></p>
+<p><em>Built using Zelig version 5.1.4</em></p>
 <hr>
 <p>Bootstrapping is often used to obtain a robust estimate of the uncertainty of a parameter due to sampling error.</p>
 <ul>
-<li><p>In the nonparametric bootstrap, new datasets are iteratively created by resampling with replacement from the original dataset. Resampling from the available sample data gives an approximation of sampling new datasets from the original population. The model of interest is rerun in each newly constructed dataset, and the distribution of parameter estimates shows the variance of the sampling distribution. This can create a robust numerical confidence interval for the sampling uncertainty of this parameter, and indeed recover a confidence interval when such is not analytically tractable.</p></li>
-<li><p>In the parametric bootstrap, we instead use the model estimates from the original sample data to create these new datasets, or some other function of those datsets.</p></li>
-</ul>
-<p>The normal algorithm that Zelig uses to simulate quantities of interest is a form of the parametric bootstrap. Zelig has an argument, however, to switch to the nonparametric bootstrap. Hereafter, when we say bootstrap, we imply the nonparametric form.</p>
-<p>The <code><a href="../reference/zelig.html">zelig()</a></code> <code>bootstrap</code> argument has a default of <code>FALSE</code>, and can be set to <code>TRUE</code> or a numeric value giving the number of bootstrapped datasets to run. If set to <code>TRUE</code> the default is 100 bootstraps. The bootstrap works in combination with other Zelig arguments as follows:</p>
-<ul>
-<li><p>If a dataset of <span class="math inline">\(N\)</span> observations is supplied with weights, the bootstrap will provide a new dataset of size <span class="math inline">\(N\)</span>, with probability of each observation being resampled directly proportional to the weighting on that observation.</p></li>
-<li><p>Presently, <em>if the data is multiply imputed, the bootstrap function is disabled</em>. We are currently researching correct interaction and implementation of the bootstrap across imputed datasets.</p></li>
-<li><p>Presently, the bootstrap is available for all models implemented in Zelig, except MCMC models and time-series models. Models utilizing MCMC sampling aren’t conformable with a bootstrap, as they are different approaches to the same concept. The serial correlation assumptions in time-series models violate the assumption that the observations present in the sample are drawn independently and identically (iid) from the population, and make appropriate bootstrap designs more complicated. Zelig does not presently have a time-series appropriate bootstrap design (such as residual bootstraps or the block bootstrap), so the bootstrap is not an option for this set of models.</p></li>
+<li>In the nonparametric bootstrap, new datasets are iteratively created by resampling with replacement from the original dataset. Resampling from the available sample data gives an approximation of sampling new datasets from the original population. The model of interest is rerun in each newly constructed dataset, and the distribution of parameter estimates shows the variance of the sampling distribution. This can create a robust numerical confidence interval for the sampling uncertainty of this parameter, and indeed recover a confidence interval when such is not analytically tractable.</li>
 </ul>
 <div id="examples" class="section level2">
 <h2 class="hasAnchor">
 <a href="#examples" class="anchor"></a>Examples</h2>
 <p>Attach sample data:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(macro)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(car)
+<span class="kw">library</span>(boot)</code></pre></div>
+<pre><code>## 
+## Attaching package: 'boot'</code></pre>
+<pre><code>## The following object is masked from 'package:car':
+## 
+##     logit</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(macro, <span class="dt">package =</span> <span class="st">"Zelig"</span>)</code></pre></div>
 <p>Estimate the model, setting the number of bootstrapped datasets to construct:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">z.out &lt;-<span class="st"> </span><span class="kw"><a href="../reference/zelig.html">zelig</a></span>(unem <span class="op">~</span><span class="st"> </span>gdp <span class="op">+</span><span class="st"> </span>capmob <span class="op">+</span><span class="st"> </span>trade,
-               <span class="dt">model =</span> <span class="st">"ls"</span>, <span class="dt">data =</span> macro, <span class="dt">bootstrap =</span> <span class="dv">500</span>)</code></pre></div>
-<pre><code>## How to cite this model in Zelig:
-##   R Core Team. 2007.
-##   ls: Least Squares Regression for Continuous Dependent Variables
-##   in Christine Choirat, Christopher Gandrud, James Honaker, Kosuke Imai, Gary King, and Olivia Lau,
-##   "Zelig: Everyone's Statistical Software," http://zeligproject.org/</code></pre>
-<p>Summary by default shows the point parameter estimates, with the standard errors generated by the bootstrap.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(z.out)</code></pre></div>
-<pre><code>## Model: Combined Bootstraps 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">out &lt;-<span class="st"> </span><span class="kw">lm</span>(unem <span class="op">~</span><span class="st"> </span>gdp <span class="op">+</span><span class="st"> </span>capmob <span class="op">+</span><span class="st"> </span>trade,
+          <span class="dt">data =</span> macro)
+out.boot &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/car/topics/Boot">Boot</a></span>(out, <span class="dt">R =</span> <span class="dv">50</span>)</code></pre></div>
+<p>Summary by default shows the original and bootstrapped point parameter estimates, with the standard errors generated by the bootstrap.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(out.boot)</code></pre></div>
+<pre><code>##              R  original   bootBias   bootSE   bootMed
+## (Intercept) 50  6.181294  0.1365541 0.413390  6.306729
+## gdp         50 -0.323601 -0.0127112 0.054106 -0.342607
+## capmob      50  1.421939  0.0029267 0.139833  1.402953
+## trade       50  0.019854 -0.0014672 0.004996  0.019192</code></pre>
+<p>We can also calculate confidence intervals and examine the bootstrapped distribution.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(out.boot)</code></pre></div>
+<pre><code>## Warning in confint.boot(out.boot): BCa method fails for this problem. Using
+## 'perc' instead</code></pre>
+<pre><code>## Bootstrap quantiles, type =  percent 
 ## 
-##             Estimate Std.Error z value Pr(&gt;|z|)
-## (Intercept)  6.18129   0.43787   14.12  &lt; 2e-16
-## gdp         -0.32360   0.05580   -5.80  6.7e-09
-## capmob       1.42194   0.16502    8.62  &lt; 2e-16
-## trade        0.01985   0.00534    3.72    2e-04
-## 
-## For results from individual bootstrapped datasets, use summary(x, subset = i:j)
-## Next step: Use 'setx' method</code></pre>
-<p>We can instead choose to show the <em>bagging</em> estimator, that is, the average parameter value across all the bootstrapped datasets. Bagging generally trades bias for a reduction in variance that results in lower mean squared error (notably in non-linear models). The bagging estimator can be obtained as:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(z.out, <span class="dt">bagging =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## Model: Combined Bootstraps 
-## 
-##             Estimate Std.Error z value Pr(&gt;|z|)
-## (Intercept)  6.18129   0.43787   14.12  &lt; 2e-16
-## gdp         -0.32360   0.05580   -5.80  6.7e-09
-## capmob       1.42194   0.16502    8.62  &lt; 2e-16
-## trade        0.01985   0.00534    3.72    2e-04
-## 
-## For results from individual bootstrapped datasets, use summary(x, subset = i:j)
-## Next step: Use 'setx' method</code></pre>
-<p>If we want to inspect particular individual results, the subset argument is available:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(z.out, <span class="dt">subset =</span> <span class="dv">13</span><span class="op">:</span><span class="dv">15</span>)</code></pre></div>
-<pre><code>## Bootstrapped Dataset 13
-## Call:
-## z5$zelig(formula = unem ~ gdp + capmob + trade, data = macro, 
-##     bootstrap = 500)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -4.4731 -2.1510 -0.7507  1.8016  8.0866 
-## 
-## Coefficients:
-##              Estimate Std. Error t value Pr(&gt;|t|)
-## (Intercept)  5.341864   0.419883  12.722  &lt; 2e-16
-## gdp         -0.317835   0.062931  -5.050 7.14e-07
-## capmob       0.915843   0.180335   5.079 6.23e-07
-## trade        0.019740   0.005985   3.298  0.00107
-## 
-## Residual standard error: 2.708 on 346 degrees of freedom
-## Multiple R-squared:  0.2023, Adjusted R-squared:  0.1954 
-## F-statistic: 29.26 on 3 and 346 DF,  p-value: &lt; 2.2e-16
-## 
-## Bootstrapped Dataset 14
-## Call:
-## z5$zelig(formula = unem ~ gdp + capmob + trade, data = macro, 
-##     bootstrap = 500)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -5.2987 -2.2535 -0.4098  2.0188  5.9420 
-## 
-## Coefficients:
-##              Estimate Std. Error t value Pr(&gt;|t|)
-## (Intercept)  5.930725   0.435651  13.613  &lt; 2e-16
-## gdp         -0.303369   0.062188  -4.878 1.64e-06
-## capmob       1.414034   0.174193   8.118 8.43e-15
-## trade        0.024247   0.005542   4.375 1.61e-05
-## 
-## Residual standard error: 2.817 on 346 degrees of freedom
-## Multiple R-squared:  0.2789, Adjusted R-squared:  0.2726 
-## F-statistic: 44.61 on 3 and 346 DF,  p-value: &lt; 2.2e-16
-## 
-## Bootstrapped Dataset 15
-## Call:
-## z5$zelig(formula = unem ~ gdp + capmob + trade, data = macro, 
-##     bootstrap = 500)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -5.7300 -2.3095  0.0192  2.1121  7.1824 
-## 
-## Coefficients:
-##              Estimate Std. Error t value Pr(&gt;|t|)
-## (Intercept)  6.834144   0.490435  13.935  &lt; 2e-16
-## gdp         -0.314014   0.067781  -4.633 5.12e-06
-## capmob       1.581995   0.176602   8.958  &lt; 2e-16
-## trade        0.013709   0.006002   2.284    0.023
-## 
-## Residual standard error: 2.837 on 346 degrees of freedom
-## Multiple R-squared:  0.2667, Adjusted R-squared:  0.2604 
-## F-statistic: 41.95 on 3 and 346 DF,  p-value: &lt; 2.2e-16
-## 
-## Next step: Use 'setx' method</code></pre>
-<p>If <span class="math inline">\(B\)</span> bootstraps were obtained, the first <span class="math inline">\(B\)</span> results are those models on the bootstrapped data, and the <span class="math inline">\(B+1\)</span> <em>-th</em> result is the model estimated on the original data. The value of <span class="math inline">\(B\)</span> is stored in a field in the Zelig object, named <code>bootstrap.num</code>. In our running example this was 500:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(z.out, <span class="dt">subset =</span> (z.out<span class="op">$</span>bootstrap.num <span class="op">+</span><span class="st"> </span><span class="dv">1</span>))</code></pre></div>
-<pre><code>## Bootstrapped Dataset 501
-## Call:
-## z5$zelig(formula = unem ~ gdp + capmob + trade, data = macro, 
-##     bootstrap = 500)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -5.3008 -2.0768 -0.3187  1.9789  7.7715 
-## 
-## Coefficients:
-##              Estimate Std. Error t value Pr(&gt;|t|)
-## (Intercept)  6.181294   0.450572  13.719  &lt; 2e-16
-## gdp         -0.323601   0.062820  -5.151 4.36e-07
-## capmob       1.421939   0.166443   8.543 4.22e-16
-## trade        0.019854   0.005606   3.542 0.000452
-## 
-## Residual standard error: 2.746 on 346 degrees of freedom
-## Multiple R-squared:  0.2878, Adjusted R-squared:  0.2817 
-## F-statistic: 46.61 on 3 and 346 DF,  p-value: &lt; 2.2e-16
-## 
-## Next step: Use 'setx' method</code></pre>
+##                    2.5 %      97.5 %
+## (Intercept)  5.548899595  7.52513502
+## gdp         -0.471561458 -0.23611442
+## capmob       1.164458097  1.71142800
+## trade        0.005176712  0.02678396</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">hist</span>(out.boot)</code></pre></div>
+<pre><code>## Warning in confint.boot(x, type = ci, level = level): BCa method fails for
+## this problem. Using 'perc' instead</code></pre>
+<p><img src="bootstraps_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
 </div>
 </div>
   </div>

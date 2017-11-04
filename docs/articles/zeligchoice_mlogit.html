@@ -123,13 +123,13 @@
     <div class="page-header toc-ignore">
       <h1>Mutlinomial Logit</h1>
             
-            <h4 class="date">2017-10-29</h4>
+            <h4 class="date">2017-11-03</h4>
           </div>
 
     
     
 <div class="contents">
-<p><em>Built using Zelig version 5.1.4.90000</em></p>
+<p><em>Built using Zelig version 5.1.4</em></p>
 <hr>
 <p>Multinomial Logistic Regression for Dependent Variables with Unordered Categorical Values with <code>mlogit</code> in ZeligChoice.</p>
 <p>Use the multinomial logit distribution to model unordered categorical variables. The dependent variable may be in the format of either character strings or integer values. See <a href="zelig_mlogitbayes.html">Multinomial Bayesian Logistic Regression</a> for a Bayesian version of this model.</p>
@@ -200,28 +200,28 @@ x.strong &lt;-<span class="st"> </span><span class="kw"><a href="../reference/se
 ##  -----
 ## ev
 ##              mean         sd       50%      2.5%     97.5%
-## Pr(Y=1) 0.7125607 0.02126999 0.7135892 0.6700842 0.7537237
-## Pr(Y=2) 0.1288215 0.01480180 0.1277746 0.1026277 0.1603835
-## Pr(Y=3) 0.1586178 0.01644167 0.1583075 0.1286804 0.1927543
+## Pr(Y=1) 0.7135823 0.02135999 0.7147961 0.6688456 0.7528416
+## Pr(Y=2) 0.1278028 0.01478712 0.1273292 0.1027060 0.1594311
+## Pr(Y=3) 0.1586148 0.01649053 0.1569599 0.1288408 0.1928005
 ## pv
-##        1     2     3
-## [1,] 0.7 0.137 0.163
+##          1     2     3
+## [1,] 0.705 0.134 0.161
 ## 
 ##  sim x1 :
 ##  -----
 ## ev
 ##              mean         sd       50%      2.5%     97.5%
-## Pr(Y=1) 0.4031843 0.02184860 0.4033209 0.3613922 0.4468739
-## Pr(Y=2) 0.3040039 0.02187937 0.3037288 0.2645768 0.3488399
-## Pr(Y=3) 0.2928118 0.02102680 0.2918071 0.2537728 0.3357307
+## Pr(Y=1) 0.4019369 0.02265808 0.4012804 0.3558947 0.4450733
+## Pr(Y=2) 0.3040716 0.02047977 0.3031698 0.2665333 0.3430433
+## Pr(Y=3) 0.2939915 0.02161994 0.2932417 0.2536080 0.3388468
 ## pv
 ##          1     2     3
-## [1,] 0.408 0.283 0.309
+## [1,] 0.411 0.285 0.304
 ## fd
 ##               mean         sd        50%        2.5%      97.5%
-## Pr(Y=1) -0.3093764 0.03330788 -0.3098321 -0.37300500 -0.2447529
-## Pr(Y=2)  0.1751824 0.02784848  0.1755189  0.12114315  0.2301688
-## Pr(Y=3)  0.1341940 0.02792288  0.1345650  0.08144286  0.1892681</code></pre>
+## Pr(Y=1) -0.3116454 0.03356551 -0.3111124 -0.37737166 -0.2450565
+## Pr(Y=2)  0.1762687 0.02657758  0.1763852  0.12459392  0.2264868
+## Pr(Y=3)  0.1353767 0.02841450  0.1355525  0.08230962  0.1914062</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(s.out.mlogit)</code></pre></div>
 <div class="figure">
 <img src="zeligchoice_mlogit_files/figure-html/Zelig-mlogit1-1.png" alt="Graphs of Quantities of Interest for Multinomial Logit" width="672"><p class="caption">

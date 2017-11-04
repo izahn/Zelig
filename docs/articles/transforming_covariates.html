@@ -123,57 +123,96 @@
     <div class="page-header toc-ignore">
       <h1>Transforming Covariates</h1>
             
-            <h4 class="date">2017-10-29</h4>
+            <h4 class="date">2017-11-03</h4>
           </div>
 
     
     
 <div class="contents">
-<p><em>Built using Zelig version 5.1.4.90000</em></p>
+<p><em>Built using Zelig version 5.1.4</em></p>
 <div id="supported-transformations" class="section level2">
 <h2 class="hasAnchor">
 <a href="#supported-transformations" class="anchor"></a> Supported transformations</h2>
-<p>For convenience, you may wish to transform one or more of your covariates within the <code>zelig</code> model estimation call. For example, imagine we want to natural log transform the variable <code>dist</code> in a linear regression:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(zeligverse)
-<span class="kw">library</span>(dplyr)
-
-z.log &lt;-<span class="st"> </span><span class="kw"><a href="../reference/zelig.html">zelig</a></span>(speed <span class="op">~</span><span class="st"> </span><span class="kw">log</span>(dist), <span class="dt">data =</span> cars, <span class="dt">model =</span> <span class="st">'ls'</span>, <span class="dt">cite =</span> <span class="ot">FALSE</span>)</code></pre></div>
-<p>Then we want to find quantities of interest when the <code>dist</code> variable is 26 to 56 (the first to third quartile). To do this we added the logged fitted values to <code>setx</code>, simulate quantities of interest, and plot the results:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/setx.html">setx</a></span>(z.log, <span class="dt">dist =</span> <span class="kw">log</span>(<span class="dv">26</span><span class="op">:</span><span class="dv">56</span>)) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="../reference/sim.html">sim</a></span>() <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw">plot</span>(<span class="dt">xlab =</span> <span class="st">'dist (log)'</span>)</code></pre></div>
-<p><img src="transforming_covariates_files/figure-html/unnamed-chunk-2-1.png" width="672"></p>
+<p>For convenience, you may wish to transform one or more of your covariates within the model estimation call. For example, imagine we want to natural log transform the variable <code>dist</code> in a linear regression:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">z.log &lt;-<span class="st"> </span><span class="kw">lm</span>(speed <span class="op">~</span><span class="st"> </span><span class="kw">log</span>(dist), <span class="dt">data =</span> cars)</code></pre></div>
+<p>Then we want to find quantities of interest when the <code>dist</code> variable is 26 to 56 (the first to third quartile):</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(effects)</code></pre></div>
+<pre><code>## Loading required package: carData</code></pre>
+<pre><code>## lattice theme set by effectsTheme()
+## See ?effectsTheme for details.</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(lsmeans)</code></pre></div>
+<pre><code>## Loading required package: estimability</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">zef &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/effects/topics/effect">Effect</a></span>(<span class="st">"dist"</span>, z.log, <span class="dt">xlevels =</span> <span class="kw">list</span>(<span class="dt">dist =</span> <span class="dv">26</span><span class="op">:</span><span class="dv">50</span>))
+<span class="kw">as.data.frame</span>(zef)</code></pre></div>
+<pre><code>##    dist      fit        se    lower    upper
+## 1    26 13.84416 0.4570535 12.92520 14.76313
+## 2    27 14.05552 0.4503177 13.15010 14.96095
+## 3    28 14.25919 0.4446788 13.36511 15.15328
+## 4    29 14.45572 0.4400611 13.57091 15.34052
+## 5    30 14.64558 0.4363922 13.76815 15.52300
+## 6    31 14.82921 0.4336033 13.95739 15.70103
+## 7    32 15.00702 0.4316286 14.13917 15.87486
+## 8    33 15.17935 0.4304055 14.31396 16.04474
+## 9    34 15.34653 0.4298744 14.48221 16.21085
+## 10   35 15.50887 0.4299787 14.64434 16.37340
+## 11   36 15.66664 0.4306650 14.80073 16.53255
+## 12   37 15.82008 0.4318831 14.95173 16.68844
+## 13   38 15.96944 0.4335856 15.09765 16.84122
+## 14   39 16.11491 0.4357284 15.23882 16.99100
+## 15   40 16.25670 0.4382705 15.37549 17.13790
+## 16   41 16.39498 0.4411735 15.50794 17.28202
+## 17   42 16.52994 0.4444021 15.63641 17.42347
+## 18   43 16.66172 0.4479236 15.76111 17.56233
+## 19   44 16.79047 0.4517080 15.88225 17.69869
+## 20   45 16.91632 0.4557275 16.00002 17.83262
+## 21   46 17.03941 0.4599570 16.11461 17.96422
+## 22   47 17.15985 0.4643732 16.22617 18.09354
+## 23   48 17.27776 0.4689549 16.33486 18.22066
+## 24   49 17.39324 0.4736829 16.44083 18.34564
+## 25   50 17.50638 0.4785395 16.54421 18.46855</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="http://www.rdocumentation.org/packages/lsmeans/topics/lsmeans">lsmeans</a></span>(z.log, <span class="st">"dist"</span>, <span class="dt">at =</span> <span class="kw">list</span>(<span class="dt">dist =</span> <span class="dv">26</span><span class="op">:</span><span class="dv">50</span>))</code></pre></div>
+<pre><code>##  dist   lsmean        SE df lower.CL upper.CL
+##    26 13.84416 0.4570535 48 12.92520 14.76313
+##    27 14.05552 0.4503177 48 13.15010 14.96095
+##    28 14.25919 0.4446788 48 13.36511 15.15328
+##    29 14.45572 0.4400611 48 13.57091 15.34052
+##    30 14.64558 0.4363922 48 13.76815 15.52300
+##    31 14.82921 0.4336033 48 13.95739 15.70103
+##    32 15.00702 0.4316286 48 14.13917 15.87486
+##    33 15.17935 0.4304055 48 14.31396 16.04474
+##    34 15.34653 0.4298744 48 14.48221 16.21085
+##    35 15.50887 0.4299787 48 14.64434 16.37340
+##    36 15.66664 0.4306650 48 14.80073 16.53255
+##    37 15.82008 0.4318831 48 14.95173 16.68844
+##    38 15.96944 0.4335856 48 15.09765 16.84122
+##    39 16.11491 0.4357284 48 15.23882 16.99100
+##    40 16.25670 0.4382705 48 15.37549 17.13790
+##    41 16.39498 0.4411735 48 15.50794 17.28202
+##    42 16.52994 0.4444021 48 15.63641 17.42347
+##    43 16.66172 0.4479236 48 15.76111 17.56233
+##    44 16.79047 0.4517080 48 15.88225 17.69869
+##    45 16.91632 0.4557275 48 16.00002 17.83262
+##    46 17.03941 0.4599570 48 16.11461 17.96422
+##    47 17.15985 0.4643732 48 16.22617 18.09354
+##    48 17.27776 0.4689549 48 16.33486 18.22066
+##    49 17.39324 0.4736829 48 16.44083 18.34564
+##    50 17.50638 0.4785395 48 16.54421 18.46855
+## 
+## Confidence level used: 0.95</code></pre>
 <p>We could also estimate the model with <code>dist</code> as a polynomial. For example:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Find range of polynomial values</span>
-dist_range &lt;-<span class="st"> </span><span class="kw">min</span>(cars<span class="op">$</span>dist)<span class="op">:</span><span class="kw">max</span>(cars<span class="op">$</span>dist)
-
-<span class="kw"><a href="../reference/zelig.html">zelig</a></span>(speed <span class="op">~</span><span class="st"> </span>dist <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(dist<span class="op">^</span><span class="dv">2</span>), <span class="dt">data =</span> cars, <span class="dt">model =</span> <span class="st">'ls'</span>,
-      <span class="dt">cite =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="../reference/setx.html">setx</a></span>(<span class="dt">dist =</span> dist_range) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="../reference/sim.html">sim</a></span>() <span class="op">%&gt;%</span>
+<span class="kw">library</span>(magrittr)
+<span class="kw">lm</span>(speed <span class="op">~</span><span class="st"> </span><span class="kw">poly</span>(dist, <span class="dv">2</span>), <span class="dt">data =</span> cars) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw"><a href="http://www.rdocumentation.org/packages/effects/topics/effect">Effect</a></span>(<span class="dt">focal.predictors =</span> <span class="st">"dist"</span>) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">plot</span>()</code></pre></div>
 <p><img src="transforming_covariates_files/figure-html/unnamed-chunk-3-1.png" width="672"></p>
-</div>
-<div id="splines" class="section level2">
-<h2 class="hasAnchor">
-<a href="#splines" class="anchor"></a>Splines</h2>
-<p>The ability to transform covariates with splines in the <code>zelig</code> model formula and then set/simulate quantities of interest is currently in development. In the meantime. You can transform the covariates outside of the <code>zelig</code> model estimation call. For example, we can include splines for <code>dist</code> in the following way:</p>
+<p>Splines and other transformations should generally work as expected.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(splines)
-cars.splines &lt;-<span class="st"> </span><span class="kw">cbind</span>(cars, <span class="kw"><a href="http://www.rdocumentation.org/packages/splines/topics/bs">bs</a></span>(cars<span class="op">$</span>dist))
-<span class="kw">names</span>(cars.splines)[<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'dist_bs_1'</span>, <span class="st">'dist_bs_2'</span>, <span class="st">'dist_bs_3'</span>)
 
-<span class="kw"><a href="../reference/zelig.html">zelig</a></span>(speed <span class="op">~</span><span class="st"> </span>dist_bs_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>dist_bs_<span class="dv">2</span> <span class="op">+</span><span class="st"> </span>dist_bs_<span class="dv">3</span>, <span class="dt">data =</span> cars.splines,
-      <span class="dt">model =</span> <span class="st">'ls'</span>, <span class="dt">cite =</span> <span class="ot">FALSE</span>) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="../reference/setx.html">setx</a></span>(<span class="dt">dist_bs_1 =</span> <span class="kw">c</span>(<span class="kw">min</span>(cars.splines<span class="op">$</span>dist_bs_<span class="dv">1</span>), <span class="kw">median</span>(cars.splines<span class="op">$</span>dist_bs_<span class="dv">1</span>),
-                       <span class="kw">max</span>(cars.splines<span class="op">$</span>dist_bs_<span class="dv">2</span>)),
-         <span class="dt">dist_bs_2 =</span> <span class="kw">c</span>(<span class="kw">min</span>(cars.splines<span class="op">$</span>dist_bs_<span class="dv">2</span>), <span class="kw">median</span>(cars.splines<span class="op">$</span>dist_bs_<span class="dv">2</span>),
-                       <span class="kw">max</span>(cars.splines<span class="op">$</span>dist_bs_<span class="dv">2</span>)),
-         <span class="dt">dist_bs_3 =</span> <span class="kw">c</span>(<span class="kw">min</span>(cars.splines<span class="op">$</span>dist_bs_<span class="dv">3</span>), <span class="kw">median</span>(cars.splines<span class="op">$</span>dist_bs_<span class="dv">3</span>),
-                       <span class="kw">max</span>(cars.splines<span class="op">$</span>dist_bs_<span class="dv">3</span>))) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="../reference/sim.html">sim</a></span>() <span class="op">%&gt;%</span>
+<span class="kw">lm</span>(speed <span class="op">~</span><span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/splines/topics/bs">bs</a></span>(dist, <span class="dt">df =</span> <span class="dv">4</span>), <span class="dt">data =</span> cars) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw"><a href="http://www.rdocumentation.org/packages/effects/topics/effect">Effect</a></span>(<span class="dt">focal.predictors =</span> <span class="st">"dist"</span>) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">plot</span>()</code></pre></div>
 <p><img src="transforming_covariates_files/figure-html/unnamed-chunk-4-1.png" width="672"></p>
-<p>Note that this example was for syntax illustration purposes only. You probably want to use a more continuous range of values for the splines. Make sure that you have an equal number of fitted values for each component of the spline and that these are all in the same order.</p>
 </div>
 </div>
   </div>
@@ -184,7 +223,6 @@ cars.splines &lt;-<span class="st"> </span><span class="kw">cbind</span>(cars, <
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#supported-transformations"> Supported transformations</a></li>
-      <li><a href="#splines">Splines</a></li>
       </ul>
 </div>
       </div>

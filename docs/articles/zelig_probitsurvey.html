@@ -123,13 +123,13 @@
     <div class="page-header toc-ignore">
       <h1>Probit Regression for Dependent Variables with Survey Weights</h1>
             
-            <h4 class="date">2017-10-29</h4>
+            <h4 class="date">2017-11-03</h4>
           </div>
 
     
     
 <div class="contents">
-<p><em>Built using Zelig version 5.1.4.90000</em></p>
+<p><em>Built using Zelig version 5.1.4</em></p>
 <hr>
 <p>Probit Regression for Dichotomous Dependent Variables with Survey Weights with <code>probit.survey</code>.</p>
 <p>Use probit regression to model binary dependent variables specified as a function of a set of explanatory variables.</p>
@@ -197,22 +197,22 @@ x.high &lt;-<span class="st"> </span><span class="kw"><a href="../reference/setx
 ##  -----
 ## ev
 ##            mean         sd        50%        2.5%     97.5%
-## [1,] 0.03510943 0.02665325 0.02791981 0.005130145 0.1057188
+## [1,] 0.03632803 0.02985728 0.02789613 0.004954274 0.1166484
 ## pv
 ##          0     1
-## [1,] 0.964 0.036
+## [1,] 0.961 0.039
 ## 
 ##  sim x1 :
 ##  -----
 ## ev
 ##           mean         sd       50%      2.5%     97.5%
-## [1,] 0.1886298 0.04351948 0.1858431 0.1109458 0.2808305
+## [1,] 0.1883495 0.04297179 0.1851792 0.1132267 0.2761779
 ## pv
 ##          0     1
 ## [1,] 0.831 0.169
 ## fd
-##           mean         sd      50%       2.5%     97.5%
-## [1,] 0.1535203 0.04761432 0.151906 0.06034836 0.2519095</code></pre>
+##           mean         sd      50%      2.5%     97.5%
+## [1,] 0.1520215 0.04858285 0.151637 0.0622052 0.2468389</code></pre>
 <p>Generate a second set of fitted values and a plot:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(s.out1)</code></pre></div>
 <div class="figure">

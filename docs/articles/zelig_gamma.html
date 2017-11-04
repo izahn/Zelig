@@ -123,13 +123,13 @@
     <div class="page-header toc-ignore">
       <h1>Gamma Regression</h1>
             
-            <h4 class="date">2017-10-29</h4>
+            <h4 class="date">2017-11-03</h4>
           </div>
 
     
     
 <div class="contents">
-<p><em>Built using Zelig version 5.1.4.90000</em></p>
+<p><em>Built using Zelig version 5.1.4</em></p>
 <hr>
 <p>Gamma Regression for Continuous, Positive Dependent Variables with <code>gamma</code>.</p>
 <p>Use the gamma regression model if you have a positive-valued dependent variable such as the number of years a parliamentary cabinet endures, or the seconds you can stay airborne while jumping. The gamma distribution assumes that all waiting times are complete by the end of the study (censoring is not allowed).</p>
@@ -188,23 +188,23 @@ x.high &lt;-<span class="st"> </span><span class="kw"><a href="../reference/setx
 ##  sim x :
 ##  -----
 ## ev
-##         mean       sd      50%     2.5%   97.5%
-## [1,] 14.4043 1.061457 14.33427 12.47827 16.6991
+##          mean       sd      50%     2.5%    97.5%
+## [1,] 14.45486 1.100809 14.35041 12.64982 16.79159
 ## pv
-##          mean       sd      50%      2.5%   97.5%
-## [1,] 13.86111 12.33949 10.67768 0.5294782 44.9441
+##          mean       sd      50%      2.5%    97.5%
+## [1,] 13.91482 12.33178 10.78892 0.5292061 45.10363
 ## 
 ##  sim x1 :
 ##  -----
 ## ev
-##         mean       sd      50%    2.5%    97.5%
-## [1,] 19.2101 1.090567 19.13691 17.2235 21.56033
+##          mean      sd      50%     2.5%    97.5%
+## [1,] 19.19755 1.09615 19.11498 17.14507 21.41246
 ## pv
-##          mean       sd      50%     2.5%    97.5%
-## [1,] 19.86033 18.47412 14.55303 1.020767 65.90548
+##          mean       sd      50%     2.5%   97.5%
+## [1,] 19.84428 18.46746 14.58042 1.025895 65.4325
 ## fd
 ##          mean       sd      50%     2.5%    97.5%
-## [1,] 4.805793 1.499152 4.820032 1.881295 7.811935</code></pre>
+## [1,] 4.742694 1.557535 4.783646 1.554358 7.703044</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(s.out)</code></pre></div>
 <div class="figure">
 <img src="zelig_gamma_files/figure-html/Zelig-gamma-1.png" alt="Graphs of Quantities of Interest for Zelig-gamma" width="672"><p class="caption">

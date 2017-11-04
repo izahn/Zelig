@@ -123,42 +123,53 @@
     <div class="page-header toc-ignore">
       <h1>Average Treatment Effects on the Treated (ATT)</h1>
             
-            <h4 class="date">2017-10-29</h4>
+            <h4 class="date">2017-11-03</h4>
           </div>
 
     
     
 <div class="contents">
-<p><em>Built using Zelig version 5.1.4.90000</em></p>
+<p><em>Built using Zelig version 5.1.4</em></p>
 <hr>
 <div id="average-treatment-effects-on-the-treated" class="section level2">
 <h2 class="hasAnchor">
 <a href="#average-treatment-effects-on-the-treated" class="anchor"></a>Average Treatment Effects on the Treated</h2>
 <p>Sometimes the quantity of interest you are interested in is the average effect of some treatment on the group of individuals that received treatment (as opposed to, for example, the effect of the treatment averaged across all individuals in a study regardless of whether or not they received the treatment).</p>
-<p>Average Treatment Effects on the Treated (ATT) quantities of interest can be generated with the <code><a href="../reference/ATT.html">ATT()</a></code> function (or the identically named <a href="zelig5_vs_zelig4.html">Zelig 5 method</a>), for any <code>zelig</code> model that can construct expected values. Once you have simulated the ATT, they can be retrieved with the QI <a href="getters.html">getters</a> function: <code><a href="../reference/get_qi.html">get_qi()</a></code>. For example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(zeligverse)
-<span class="kw">library</span>(dplyr) <span class="co"># load %&gt;% pipe operator</span>
+<p>The tools available in R for calculating treatment effects leave a lot to be desired. For example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
 
 <span class="co"># load data and estimate model</span>
-<span class="kw">data</span>(sanction)
-zqi.out &lt;-<span class="st"> </span><span class="kw"><a href="../reference/zelig.html">zelig</a></span>(num <span class="op">~</span><span class="st"> </span>target <span class="op">+</span><span class="st"> </span>coop <span class="op">+</span><span class="st"> </span>mil, 
-                 <span class="dt">model =</span> <span class="st">"poisson"</span>, <span class="dt">data =</span> sanction, <span class="dt">cite =</span> <span class="ot">FALSE</span>)
+<span class="kw">data</span>(sanction, <span class="dt">package =</span> <span class="st">"Zelig"</span>)
 
-<span class="co"># find the ATT where the treatement is mil = 1</span>
-z.att &lt;-<span class="st"> </span>zqi.out <span class="op">%&gt;%</span>
-<span class="st">             </span><span class="kw"><a href="../reference/ATT.html">ATT</a></span>(<span class="dt">treatment =</span> <span class="st">"mil"</span>, <span class="dt">treat =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">             </span><span class="kw"><a href="../reference/get_qi.html">get_qi</a></span>(<span class="dt">qi =</span> <span class="st">"ATT"</span>, <span class="dt">xvalue =</span> <span class="st">"TE"</span>)
+m &lt;-<span class="st"> </span><span class="kw">glm</span>(num <span class="op">~</span><span class="st"> </span>target <span class="op">+</span><span class="st"> </span>coop <span class="op">+</span><span class="st"> </span>mil, <span class="dt">family =</span> <span class="st">"poisson"</span>, <span class="dt">data =</span> sanction)
 
-<span class="co"># summarize the results</span>
-<span class="kw">hist</span>(z.att, 
-     <span class="dt">main =</span> <span class="ot">NULL</span>,
-     <span class="dt">xlab =</span><span class="st">"Averege Treatment Effect of mil on the Treated"</span>)</code></pre></div>
-<p><img src="att_files/figure-html/unnamed-chunk-1-1.png" width="672"></p>
-<p>In this example the treatment variable was <code>mil</code>. Units were denoted as treated when <code>mil = 1</code>. <code>qi = "ATT", xvalue = "TE"</code> specifies that we would like to extrat the ATT quantity of interest.</p>
-</div>
-<div id="background" class="section level1">
-<h1 class="hasAnchor">
-<a href="#background" class="anchor"></a>Background</h1>
+treated &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(sanction, mil <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)
+treated &lt;-<span class="st"> </span><span class="kw">rbind</span>(treated, <span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(treated, <span class="dt">mil =</span> <span class="dv">0</span>))
+
+pred &lt;-<span class="st"> </span><span class="kw">data.frame</span>(treated,
+                   <span class="kw">predict</span>(m,
+                           <span class="dt">newdata =</span> treated,
+                           <span class="dt">type =</span> <span class="st">"response"</span>,
+                           <span class="dt">se =</span> <span class="ot">TRUE</span>))
+<span class="kw"><a href="http://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(pred, mil), <span class="dt">fitted =</span> <span class="kw">mean</span>(fit), <span class="dt">se =</span> <span class="kw">mean</span>(se.fit))</code></pre></div>
+<pre><code>## # A tibble: 2 x 3
+##     mil   fitted        se
+##   &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1     0 13.55551 0.9862148
+## 2     1  6.50000 0.9750880</code></pre>
+<p>Alternatively:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(margins)
+
+pred &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/margins/topics/reexports">prediction</a></span>(m, <span class="dt">data =</span> <span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(sanction, mil <span class="op">==</span><span class="st"> </span><span class="dv">1</span>), <span class="dt">at =</span> <span class="kw">list</span>(<span class="dt">mil =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)))</code></pre></div>
+<pre><code>## Warning in check_values(data, at): A 'at' value for 'mil' is outside
+## observed data range (1,1)!</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="http://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(pred, mil), <span class="dt">fitted =</span> <span class="kw">mean</span>(fitted), <span class="dt">se =</span> <span class="kw">mean</span>(se.fitted))</code></pre></div>
+<pre><code>## # A tibble: 2 x 3
+##     mil   fitted        se
+##   &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1     0 13.55551 0.9862148
+## 2     1  6.50000 0.9750880</code></pre>
+<p>In this example the treatment variable was <code>mil</code>. Units were denoted as treated when <code>mil = 1</code>. Background ==========</p>
 <p>Assume there is a set of treatments <span class="math inline">\(\mathbb{T} \in \{0,1\}\)</span>, e.g. in the example above: <code>mil = 0</code> and <code>mil = 1</code>. For each unit <span class="math inline">\(i\)</span> there are corresponding potential outcomes <span class="math inline">\(Y_i(0)\)</span> and <span class="math inline">\(Y_i(1)\)</span>, with unit-level casual effects of the treatment typically being: <span class="math inline">\(Y_i(1) - Y_i(0)\)</span>. The unit-level causal effect is the difference between the outcome from being exposed to the treatment and not being exposed.</p>
 <p>We can think of the average causal effect across the entire population as:</p>
 <p><span class="math display">\[
@@ -185,7 +196,6 @@ z.att &lt;-<span class="st"> </span>zqi.out <span class="op">%&gt;%</span>
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#average-treatment-effects-on-the-treated">Average Treatment Effects on the Treated</a></li>
-      <li><a href="#background">Background</a></li>
       <li><a href="#see-also">See Also</a></li>
       </ul>
 </div>

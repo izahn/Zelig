@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Using Zelig with Amelia • Zelig</title>
+<title>Using Amelia • Zelig</title>
 <!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/paper/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 <!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
@@ -121,19 +121,19 @@
       </header><div class="row">
   <div class="col-md-9">
     <div class="page-header toc-ignore">
-      <h1>Using Zelig with Amelia</h1>
+      <h1>Using Amelia</h1>
             
-            <h4 class="date">2017-10-29</h4>
+            <h4 class="date">2017-11-03</h4>
           </div>
 
     
     
 <div class="contents">
-<p><em>Built using Zelig version 5.1.4.90000</em></p>
+<p><em>Built using Zelig version 5.1.4</em></p>
 <hr>
-<p><code><a href="../reference/zelig.html">zelig()</a></code> accepts multiply imputed data output objects from the <a href="http://gking.harvard.edu/amelia">Amelia</a> package as the <code>data</code> argument.</p>
 <p>First, using the Amelia package, we multiply impute a dataset with missing values:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">"Amelia"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(purrr)
+<span class="kw">library</span>(<span class="st">"Amelia"</span>)</code></pre></div>
 <pre><code>## Loading required package: Rcpp</code></pre>
 <pre><code>## ## 
 ## ## Amelia II: Multiple Imputation
@@ -149,7 +149,7 @@ a.out &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocume
 ## 
 ## -- Imputation 2 --
 ## 
-##   1  2  3
+##   1  2
 ## 
 ## -- Imputation 3 --
 ## 
@@ -157,77 +157,22 @@ a.out &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocume
 ## 
 ## -- Imputation 4 --
 ## 
-##   1  2
+##   1  2  3
 ## 
 ## -- Imputation 5 --
 ## 
 ##   1  2  3</code></pre>
-<p>Then we can use the output object from the Amelia package directly in the data argument for Zelig:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">z.out &lt;-<span class="st"> </span><span class="kw"><a href="../reference/zelig.html">zelig</a></span>(gdp_pc <span class="op">~</span><span class="st"> </span>trade <span class="op">+</span><span class="st"> </span>civlib, <span class="dt">model =</span> <span class="st">"ls"</span>, <span class="dt">data =</span> a.out)</code></pre></div>
-<pre><code>## How to cite this model in Zelig:
-##   R Core Team. 2007.
-##   ls: Least Squares Regression for Continuous Dependent Variables
-##   in Christine Choirat, Christopher Gandrud, James Honaker, Kosuke Imai, Gary King, and Olivia Lau,
-##   "Zelig: Everyone's Statistical Software," http://zeligproject.org/</code></pre>
-<p>Zelig will automatically extract the imputed datasets from the Amelia object, and run the requested model in each of them. When the estimated model parameters are summarized, the results from each imputed dataset are available, but more importantly, the combined answer across the imputed datasets calculated by “Rubin’s Rules” are automatically presented:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(z.out)</code></pre></div>
-<pre><code>## Model: Combined Imputations 
-## 
-##             Estimate Std.Error z value Pr(&gt;|z|)
-## (Intercept)   111.76     97.74    1.14  0.25287
-## trade          18.13      1.25   14.54  &lt; 2e-16
-## civlib       -628.06    182.57   -3.44  0.00058
-## 
-## For results from individual imputed datasets, use summary(x, subset = i:j)
-## Next step: Use 'setx' method</code></pre>
-<p>To see the result from an individual imputed dataset, we use the subset argument as:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(z.out, <span class="dt">subset =</span> <span class="dv">2</span><span class="op">:</span><span class="dv">3</span>)</code></pre></div>
-<pre><code>## Imputed Dataset 2
-## Call:
-## z5$zelig(formula = gdp_pc ~ trade + civlib, data = a.out)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -676.07 -227.89  -97.05  171.76  960.10 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)
-## (Intercept)  111.436     97.503   1.143 0.255414
-## trade         18.109      1.245  14.550  &lt; 2e-16
-## civlib      -621.304    181.579  -3.422 0.000858
-## 
-## Residual standard error: 349.5 on 117 degrees of freedom
-## Multiple R-squared:  0.6541, Adjusted R-squared:  0.6482 
-## F-statistic: 110.6 on 2 and 117 DF,  p-value: &lt; 2.2e-16
-## 
-## Imputed Dataset 3
-## Call:
-## z5$zelig(formula = gdp_pc ~ trade + civlib, data = a.out)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -679.4 -217.8  -95.6  164.1  960.8 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)
-## (Intercept)  121.960     95.679   1.275 0.204947
-## trade         18.119      1.224  14.803  &lt; 2e-16
-## civlib      -645.386    179.835  -3.589 0.000486
-## 
-## Residual standard error: 346.1 on 117 degrees of freedom
-## Multiple R-squared:  0.662,  Adjusted R-squared:  0.6563 
-## F-statistic: 114.6 on 2 and 117 DF,  p-value: &lt; 2.2e-16
-## 
-## Next step: Use 'setx' method</code></pre>
-<p>When quantities of interest are plotted, such as expected and predicted values and first differenences, these are correctly pooled across those from each of the m imputed datasets:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">z.out<span class="op">$</span><span class="kw"><a href="../reference/setx.html">setx</a></span>()
-z.out<span class="op">$</span><span class="kw"><a href="../reference/sim.html">sim</a></span>()
-<span class="kw">plot</span>(z.out)</code></pre></div>
-<p><img src="using_Zelig_with_Amelia_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
-<div id="other-multiply-imputed-data" class="section level2">
+<p>Then we can use the output object from the Amelia package to fit a list of models:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">models &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/purrr/topics/map">map</a></span>(a.out<span class="op">$</span>imputations, <span class="op">~</span><span class="st"> </span><span class="kw">lm</span>(gdp_pc <span class="op">~</span><span class="st"> </span>trade <span class="op">+</span><span class="st"> </span>civlib, <span class="dt">data =</span> .))</code></pre></div>
+<p>Amelia includes a <code>mi.meld</code> function that can be used to combine the results:</p>
+<p>``{r} mi.meld(reduce(map(models, coef), rbind), reduce(map(models, ~ coef(summary(.))[, “Std. Error”]), rbind)) ```</p>
+<p>Nicer output is available from several of the available multiple-imputation packages in R, including the <em>mice</em> and <em>mitools</em>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(mice)</code></pre></div>
+<pre><code>## Loading required package: lattice</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">foo &lt;-<span class="st"> </span><span class="kw">summary</span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/mice/topics/pool">pool</a></span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/mice/topics/as.mira">as.mira</a></span>(models)))</code></pre></div>
+<div id="todo-quantities-of-interest-for-mi" class="section level2">
 <h2 class="hasAnchor">
-<a href="#other-multiply-imputed-data" class="anchor"></a>Other multiply imputed data</h2>
-<p>Zelig also includes a function called <code><a href="../reference/from_zelig_model.html">from_zelig_model()</a></code> to conform multiply imputed data sets from other sources to a form that <code>zelig</code> can use.</p>
+<a href="#todo-quantities-of-interest-for-mi" class="anchor"></a>TODO: quantities of interest for MI</h2>
 </div>
 </div>
   </div>
@@ -237,7 +182,7 @@ z.out<span class="op">$</span><span class="kw"><a href="../reference/sim.html">s
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-<li><a href="#other-multiply-imputed-data">Other multiply imputed data</a></li>
+<li><a href="#todo-quantities-of-interest-for-mi">TODO: quantities of interest for MI</a></li>
       </ul>
 </div>
       </div>

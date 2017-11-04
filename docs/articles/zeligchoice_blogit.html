@@ -123,13 +123,13 @@
     <div class="page-header toc-ignore">
       <h1>Bivariate Logistic Regression</h1>
             
-            <h4 class="date">2017-10-29</h4>
+            <h4 class="date">2017-11-03</h4>
           </div>
 
     
     
 <div class="contents">
-<p><em>Built using Zelig version 5.1.4.90000</em></p>
+<p><em>Built using Zelig version 5.1.4</em></p>
 <hr>
 <p>Bivariate Logistic Regression for Two Dichotomous Dependent Variables with <code>blogit</code> from ZeligChoice.</p>
 <p>Use the bivariate logistic regression model if you have two binary dependent variables <span class="math inline">\((Y_1, Y_2)\)</span>, and wish to model them jointly as a function of some explanatory variables. Each pair of dependent variables <span class="math inline">\((Y_{i1}, Y_{i2})\)</span> has four potential outcomes, <span class="math inline">\((Y_{i1}=1, Y_{i2}=1)\)</span>, <span class="math inline">\((Y_{i1}=1, Y_{i2}=0)\)</span>, <span class="math inline">\((Y_{i1}=0, Y_{i2}=1)\)</span>, and <span class="math inline">\((Y_{i1}=0, Y_{i2}=0)\)</span>. The joint probability for each of these four outcomes is modeled with three systematic components: the marginal Pr <span class="math inline">\((Y_{i1} = 1)\)</span> and Pr <span class="math inline">\((Y_{i2} = 1)\)</span>, and the odds ratio <span class="math inline">\(\psi\)</span>, which describes the dependence of one marginal on the other. Each of these systematic components may be modeled as functions of (possibly different) sets of explanatory variables.</p>
@@ -217,15 +217,15 @@ x.high &lt;-<span class="st"> </span><span class="kw"><a href="../reference/setx
 ##  sim x :
 ##  -----
 ## ev
-##                       mean          sd         50%         2.5%      97.5%
-## Pr(Y1=0, Y2=0) 0.764861591 0.076898592 0.772636018 0.5944076854 0.88725505
-## Pr(Y1=0, Y2=1) 0.154020913 0.070016048 0.142438021 0.0489447680 0.31276532
-## Pr(Y1=1, Y2=0) 0.072289227 0.042523632 0.063896509 0.0181190387 0.17905193
-## Pr(Y1=1, Y2=1) 0.008828269 0.008855768 0.006083191 0.0009329502 0.03424973
+##                       mean          sd         50%         2.5%     97.5%
+## Pr(Y1=0, Y2=0) 0.764815522 0.076955324 0.772672242 0.5930177133 0.8870631
+## Pr(Y1=0, Y2=1) 0.153707009 0.069937318 0.142823725 0.0469303578 0.3200105
+## Pr(Y1=1, Y2=0) 0.072635446 0.043077411 0.063813025 0.0184599884 0.1856316
+## Pr(Y1=1, Y2=1) 0.008842023 0.008870533 0.006053319 0.0009307628 0.0345644
 ## pv
 ##                  0     1
-## (Y1=0, Y2=0) 0.228 0.772
-## (Y1=0, Y2=1) 0.862 0.138
+## (Y1=0, Y2=0) 0.227 0.773
+## (Y1=0, Y2=1) 0.863 0.137
 ## (Y1=1, Y2=0) 0.922 0.078
 ## (Y1=1, Y2=1) 0.988 0.012
 ## 
@@ -233,27 +233,27 @@ x.high &lt;-<span class="st"> </span><span class="kw"><a href="../reference/setx
 ##  -----
 ## ev
 ##                        mean           sd          50%         2.5%
-## Pr(Y1=0, Y2=0) 6.764547e-05 0.0002870721 8.479136e-06 1.122442e-07
-## Pr(Y1=0, Y2=1) 2.285438e-02 0.0381670056 8.975354e-03 5.498571e-04
-## Pr(Y1=1, Y2=0) 5.892645e-03 0.0157226985 1.655853e-03 6.435737e-05
-## Pr(Y1=1, Y2=1) 9.711853e-01 0.0402994376 9.849211e-01 8.690317e-01
+## Pr(Y1=0, Y2=0) 7.022624e-05 0.0003105412 8.153798e-06 1.167005e-07
+## Pr(Y1=0, Y2=1) 2.325256e-02 0.0377265225 9.659952e-03 5.540607e-04
+## Pr(Y1=1, Y2=0) 5.839800e-03 0.0152603881 1.675341e-03 6.349162e-05
+## Pr(Y1=1, Y2=1) 9.708374e-01 0.0397525382 9.846239e-01 8.512076e-01
 ##                       97.5%
-## Pr(Y1=0, Y2=0) 0.0005593426
-## Pr(Y1=0, Y2=1) 0.1159743052
-## Pr(Y1=1, Y2=0) 0.0362570809
-## Pr(Y1=1, Y2=1) 0.9983926520
+## Pr(Y1=0, Y2=0) 0.0005586779
+## Pr(Y1=0, Y2=1) 0.1374179224
+## Pr(Y1=1, Y2=0) 0.0364313604
+## Pr(Y1=1, Y2=1) 0.9984203100
 ## pv
 ##                  0     1
 ## (Y1=0, Y2=0) 1.000 0.000
-## (Y1=0, Y2=1) 0.984 0.016
+## (Y1=0, Y2=1) 0.985 0.015
 ## (Y1=1, Y2=0) 0.991 0.009
-## (Y1=1, Y2=1) 0.025 0.975
+## (Y1=1, Y2=1) 0.024 0.976
 ## fd
 ##                       mean         sd         50%       2.5%        97.5%
-## Pr(Y1=0, Y2=0) -0.76479395 0.07698080 -0.77262061 -0.8872549 -0.594345342
-## Pr(Y1=0, Y2=1) -0.13116653 0.08268646 -0.12371949 -0.3046665  0.011741846
-## Pr(Y1=1, Y2=0) -0.06639658 0.04707685 -0.05916388 -0.1759960 -0.001374144
-## Pr(Y1=1, Y2=1)  0.96235706 0.04459420  0.97703091  0.8535263  0.996593467</code></pre>
+## Pr(Y1=0, Y2=0) -0.76474530 0.07704025 -0.77265486 -0.8870604 -0.592718432
+## Pr(Y1=0, Y2=1) -0.13045445 0.08229065 -0.12391383 -0.3098630  0.022752609
+## Pr(Y1=1, Y2=0) -0.06679565 0.04737304 -0.05920138 -0.1824747 -0.002286253
+## Pr(Y1=1, Y2=1)  0.96199539 0.04415632  0.97666370  0.8332526  0.996526405</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(s.out1)</code></pre></div>
 <div class="figure">
 <img src="zeligchoice_blogit_files/figure-html/Zelig-blogit1-1.png" alt="Graphs of Quantities of Interest for Bivariate Logit" width="672"><p class="caption">

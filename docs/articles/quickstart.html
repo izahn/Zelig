@@ -123,28 +123,17 @@
     <div class="page-header toc-ignore">
       <h1>Zelig Quickstart Guide</h1>
             
-            <h4 class="date">2017-10-29</h4>
+            <h4 class="date">2017-11-03</h4>
           </div>
 
     
     
 <div class="contents">
-<p><em>Built using Zelig version 5.1.4.90000</em></p>
-<div id="zelig-workflow-overview" class="section level2">
+<p><em>Built using Zelig version 5.1.4</em></p>
+<div id="workflow-overview" class="section level2">
 <h2 class="hasAnchor">
-<a href="#zelig-workflow-overview" class="anchor"></a>Zelig workflow overview</h2>
-<p>All models in Zelig can be estimated and results explored presented using four simple functions:</p>
-<ol style="list-style-type: decimal">
-<li><p><code>zelig</code> to estimate the parameters,</p></li>
-<li><p><code>setx</code> to set fitted values for which we want to find quantities of interest,</p></li>
-<li><p><code>sim</code> to simulate the quantities of interest,</p></li>
-<li><p><code>plot</code> to plot the simulation results.</p></li>
-</ol>
-<div id="zelig-5-reference-classes" class="section level4">
-<h4 class="hasAnchor">
-<a href="#zelig-5-reference-classes" class="anchor"></a>Zelig 5 reference classes</h4>
-<p>Zelig 5 introduced <a href="http://adv-r.had.co.nz/R5.html">reference classes</a>. These enable a different way of working with Zelig that is detailed in <a href="zelig5_vs_zelig4.html">a separate vignette</a>. Directly using the reference class architecture is optional.</p>
-</div>
+<a href="#workflow-overview" class="anchor"></a>Workflow overview</h2>
+<p>Models in R can generally be fit using a formula interface. The fitted models can then be explored and post-processed in various was, for example to display an ANOVA-style table, calculate confidence intervals, or plot predictions from the model.</p>
 </div>
 <div id="examples" class="section level1">
 <h1 class="hasAnchor">
@@ -163,105 +152,120 @@
 <div id="building-models" class="section level2">
 <h2 class="hasAnchor">
 <a href="#building-models" class="anchor"></a>Building Models</h2>
-<p>Let’s assume we want to estimate the effect of education on fertility. Since fertility is a continuous variable, least squares (<code>ls</code>) is an appropriate model choice. To estimate our model, we call the <code><a href="../reference/zelig.html">zelig()</a></code> function with three two arguments: equation, model type, and data:</p>
+<p>Let’s assume we want to estimate the effect of education on fertility. Since fertility is a continuous variable, least squares is an appropriate model choice. To estimate our model, we call the <code>lm</code> function with two arguments: equation and data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load data</span>
 <span class="kw">data</span>(swiss)
 
 <span class="co"># estimate ls model</span>
-z5_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw"><a href="../reference/zelig.html">zelig</a></span>(Fertility <span class="op">~</span><span class="st"> </span>Education, <span class="dt">model =</span> <span class="st">"ls"</span>, <span class="dt">data =</span> swiss, <span class="dt">cite =</span> <span class="ot">FALSE</span>)
+z5_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">lm</span>(Fertility <span class="op">~</span><span class="st"> </span>Education, <span class="dt">data =</span> swiss)
 
 <span class="co"># model summary</span>
 <span class="kw">summary</span>(z5_<span class="dv">1</span>)</code></pre></div>
-<pre><code>## Model: 
-## 
+<pre><code>## 
 ## Call:
-## z5$zelig(formula = Fertility ~ Education, data = swiss)
+## lm(formula = Fertility ~ Education, data = swiss)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
 ## -17.036  -6.711  -1.011   9.526  19.689 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)
-## (Intercept)  79.6101     2.1041  37.836  &lt; 2e-16
-## Education    -0.8624     0.1448  -5.954 3.66e-07
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  79.6101     2.1041  37.836  &lt; 2e-16 ***
+## Education    -0.8624     0.1448  -5.954 3.66e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Residual standard error: 9.446 on 45 degrees of freedom
 ## Multiple R-squared:  0.4406, Adjusted R-squared:  0.4282 
-## F-statistic: 35.45 on 1 and 45 DF,  p-value: 3.659e-07
-## 
-## Next step: Use 'setx' method</code></pre>
-<p>The -0.86 coefficient on education suggests a negative relationship between the education of a province and its fertility rate. More precisely, for every one percent increase in draftees educated beyond primary school, the fertility rate of the province decreases 0.86 units. To help us better interpret this finding, we may want other quantities of interest, such as expected values or first differences. Zelig makes this simple by automating the translation of model estimates into interpretable quantities of interest using Monte Carlo simulation methods (see King, Tomz, and Wittenberg (2000) for more information). For example, let’s say we want to examine the effect of increasing the percent of draftees educated from 5 to 15. To do so, we set our predictor value using the <code><a href="../reference/setx.html">setx()</a></code> and <code><a href="../reference/setx1.html">setx1()</a></code> functions:</p>
+## F-statistic: 35.45 on 1 and 45 DF,  p-value: 3.659e-07</code></pre>
+<p>The -0.86 coefficient on education suggests a negative relationship between the education of a province and its fertility rate. More precisely, for every one percent increase in draftees educated beyond primary school, the fertility rate of the province decreases 0.86 units. To help us better interpret this finding, we may want other quantities of interest, such as expected values or first differences. The <code>margins</code> package makes this simple by automating the translation of model estimates into interpretable quantities of interest. For example, let’s say we want to examine the effect of increasing the percent of draftees educated from 5 to 15. There are several packages we can use for this:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set education to 5 and 15</span>
-z5_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw"><a href="../reference/setx.html">setx</a></span>(z5_<span class="dv">1</span>, <span class="dt">Education =</span> <span class="dv">5</span>)
-z5_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw"><a href="../reference/setx1.html">setx1</a></span>(z5_<span class="dv">1</span>, <span class="dt">Education =</span> <span class="dv">15</span>)
-
-<span class="co"># model summary</span>
-<span class="kw">summary</span>(z5_<span class="dv">1</span>)</code></pre></div>
-<pre><code>## setx:
-##   (Intercept) Education
-## 1           1         5
-## setx1:
-##   (Intercept) Education
-## 1           1        15
-## 
-## Next step: Use 'sim' method</code></pre>
-<p>After setting our predictor value, we simulate using the <code><a href="../reference/sim.html">sim()</a></code> method:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># run simulations and estimate quantities of interest</span>
-z5_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sim.html">sim</a></span>(z5_<span class="dv">1</span>)
-
-<span class="co"># model summary</span>
-<span class="kw">summary</span>(z5_<span class="dv">1</span>)</code></pre></div>
+<span class="kw">library</span>(margins)
+<span class="kw">library</span>(prediction)
+<span class="kw">library</span>(effects)</code></pre></div>
+<pre><code>## Loading required package: carData</code></pre>
+<pre><code>## lattice theme set by effectsTheme()
+## See ?effectsTheme for details.</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(lsmeans)</code></pre></div>
+<pre><code>## Loading required package: estimability</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)</code></pre></div>
 <pre><code>## 
-##  sim x :
-##  -----
-## ev
-##       mean       sd      50%     2.5%   97.5%
-## 1 75.33601 1.568926 75.35504 71.98253 78.3214
-## pv
-##          mean       sd      50%    2.5%    97.5%
-## [1,] 75.71558 9.525293 75.73353 58.5333 95.91194
+## Attaching package: 'dplyr'</code></pre>
+<pre><code>## The following object is masked from 'package:MASS':
 ## 
-##  sim x1 :
-##  -----
-## ev
-##       mean       sd      50%     2.5%   97.5%
-## 1 66.71969 1.454155 66.67102 63.87779 69.5769
-## pv
-##          mean       sd      50%     2.5%    97.5%
-## [1,] 66.87073 9.578544 66.88007 48.02027 84.90856
-## fd
-##        mean       sd       50%      2.5%     97.5%
-## 1 -8.616321 1.416013 -8.591192 -11.34729 -5.964767</code></pre>
-<p>At this point, we’ve estimated a model, set the predictor value, and estimated easily interpretable quantities of interest. The <code>summary()</code> method shows us our quantities of interest, namely, our expected and predicted values at each level of education, as well as our first differences–the difference in expected values at the set levels of education.</p>
+##     select</code></pre>
+<pre><code>## The following objects are masked from 'package:stats':
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## effects package
+ef1 &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/effects/topics/effect">Effect</a></span>(<span class="st">"Education"</span>, z5_<span class="dv">1</span>, <span class="dt">xlevels =</span> <span class="kw">list</span>(<span class="dt">Education =</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">15</span>)))
+<span class="kw">as.data.frame</span>(ef1)</code></pre></div>
+<pre><code>##   Education      fit       se    lower    upper
+## 1         5 75.29831 1.627387 72.02058 78.57603
+## 2        15 66.67480 1.495900 63.66191 69.68770</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(ef1)</code></pre></div>
+<p><img src="quickstart_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## lsmeans package
+(lsm1 &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/lsmeans/topics/lsmeans">lsmeans</a></span>(z5_<span class="dv">1</span>, <span class="st">"Education"</span>, <span class="dt">at =</span> <span class="kw">list</span>(<span class="dt">Education =</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">15</span>))))</code></pre></div>
+<pre><code>##  Education   lsmean       SE df lower.CL upper.CL
+##          5 75.29831 1.627387 45 72.02058 78.57603
+##         15 66.67480 1.495900 45 63.66191 69.68770
+## 
+## Confidence level used: 0.95</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(lsm1d &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/lsmeans/topics/contrast">pairs</a></span>(lsm1))</code></pre></div>
+<pre><code>##  contrast estimate       SE df t.ratio p.value
+##  5 - 15   8.623503 1.448447 45   5.954  &lt;.0001</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(lsm1)</code></pre></div>
+<p><img src="quickstart_files/figure-html/unnamed-chunk-6-2.png" width="672"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(lsm1d)</code></pre></div>
+<p><img src="quickstart_files/figure-html/unnamed-chunk-6-3.png" width="672"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## margins package (under development)
+ppred1 &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/margins/topics/reexports">prediction</a></span>(z5_<span class="dv">1</span>, <span class="dt">at =</span> <span class="kw">list</span>(<span class="dt">Education =</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">15</span>)))
+<span class="kw"><a href="http://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span>(<span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(ppred1, Education), <span class="kw">mean</span>(fitted), <span class="kw">mean</span>(se.fitted))</code></pre></div>
+<pre><code>## # A tibble: 2 x 3
+##   Education `mean(fitted)` `mean(se.fitted)`
+##       &lt;dbl&gt;          &lt;dbl&gt;             &lt;dbl&gt;
+## 1         5       75.29831          1.627387
+## 2        15       66.67480          1.495900</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="http://www.rdocumentation.org/packages/margins/topics/cplot">cplot</a></span>(z5_<span class="dv">1</span>)</code></pre></div>
+<p><img src="quickstart_files/figure-html/unnamed-chunk-6-4.png" width="672"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mrgn1 &lt;-<span class="st"> </span><span class="kw"><a href="http://www.rdocumentation.org/packages/margins/topics/margins">margins</a></span>(z5_<span class="dv">1</span>, <span class="dt">variables =</span> <span class="st">"Education"</span>, <span class="dt">change =</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">15</span>))
+<span class="kw"><a href="http://www.rdocumentation.org/packages/lsmeans/topics/summary">summary</a></span>(mrgn1)</code></pre></div>
+<pre><code>##     factor     AME     SE       z      p    lower   upper
+##  Education -8.6235 1.4484 -5.9536 0.0000 -11.4624 -5.7846</code></pre>
 </div>
 </div>
 <div id="visualizations" class="section level1">
 <h1 class="hasAnchor">
 <a href="#visualizations" class="anchor"></a>Visualizations</h1>
-<p>Zelig’s <code>plot()</code> function plots the estimated quantities of interest:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(z5_<span class="dv">1</span>)</code></pre></div>
-<p><img src="quickstart_files/figure-html/example_plot_graph-1.png" width="672"></p>
-<p>We can also simulate and plot simulations from ranges of simulated values:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">z5_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw"><a href="../reference/zelig.html">zelig</a></span>(Fertility <span class="op">~</span><span class="st"> </span>Education, <span class="dt">model =</span> <span class="st">"ls"</span>, <span class="dt">data =</span> swiss, <span class="dt">cite =</span> <span class="ot">FALSE</span>)
+<p>Each of the post-estimation packages noted above offers some visualization capabilities.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set education to 5 and 15</span>
+<span class="kw">library</span>(margins)
+<span class="kw">library</span>(prediction)
+<span class="kw">library</span>(effects)
+<span class="kw">library</span>(lsmeans)
+<span class="kw">library</span>(dplyr)
 
-<span class="co"># set Education to range from 5 to 15 at single integer increments</span>
-z5_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw"><a href="../reference/setx.html">setx</a></span>(z5_<span class="dv">2</span>, <span class="dt">Education =</span> <span class="dv">5</span><span class="op">:</span><span class="dv">15</span>)
-
-<span class="co"># run simulations and estimate quantities of interest</span>
-z5_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sim.html">sim</a></span>(z5_<span class="dv">2</span>)</code></pre></div>
-<p>Then use the <code>plot()</code> function as before:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">z5_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">plot</span>(z5_<span class="dv">2</span>)</code></pre></div>
-<p><img src="quickstart_files/figure-html/example_plot_ci_plot-1.png" width="480"></p>
+## effects package
+<span class="kw">plot</span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/effects/topics/effect">Effect</a></span>(<span class="st">"Education"</span>, z5_<span class="dv">1</span>))</code></pre></div>
+<p><img src="quickstart_files/figure-html/unnamed-chunk-7-1.png" width="672"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## lsmeans package
+<span class="kw">plot</span>(<span class="kw"><a href="http://www.rdocumentation.org/packages/lsmeans/topics/lsmeans">lsmeans</a></span>(z5_<span class="dv">1</span>, <span class="st">"Education"</span>, <span class="dt">at =</span> <span class="kw">list</span>(<span class="dt">Education =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">60</span>)))</code></pre></div>
+<p><img src="quickstart_files/figure-html/unnamed-chunk-7-2.png" width="672"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## margins package (under development)
+<span class="kw"><a href="http://www.rdocumentation.org/packages/margins/topics/cplot">cplot</a></span>(z5_<span class="dv">1</span>)</code></pre></div>
+<p><img src="quickstart_files/figure-html/unnamed-chunk-7-3.png" width="672"></p>
 </div>
 <div id="getting-help" class="section level1">
 <h1 class="hasAnchor">
 <a href="#getting-help" class="anchor"></a>Getting help</h1>
-<p>The primary documentation for Zelig is available at: <a href="http://docs.zeligproject.org/articles/" class="uri">http://docs.zeligproject.org/articles/</a>.</p>
-<p>Within R, you can access function help using the normal <code>?</code> function, e.g.:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><a href="../reference/setx.html">?setx</a></code></pre></div>
-<p>If you are looking for details on particlar estimation model methods, you can also use the <code>?</code> function. Simply place a <code>z</code> before the model name. For example, to access details about the <code>logit</code> model use:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><a href="../reference/Zelig-logit-class.html">?zlogit</a></code></pre></div>
+<p>Within R you can access function help using the <code>?</code> function, e.g.:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">?lm
+?Effect</code></pre></div>
 </div>
 </div>
   </div>
@@ -271,7 +275,7 @@ z5_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw"><a h
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-<li><a href="#zelig-workflow-overview">Zelig workflow overview</a></li>
+<li><a href="#workflow-overview">Workflow overview</a></li>
       <li>
 <a href="#examples">Examples</a><ul class="nav nav-pills nav-stacked">
 <li><a href="#installing-and-loading-zelig">Installing and Loading Zelig</a></li>
