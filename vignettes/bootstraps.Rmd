@@ -56,7 +56,7 @@ summary(out.boot)
 We can also calculate confidence intervals and examine the bootstrapped distribution.
 
 ```{r}
-confint(boot.out)
+confint(out.boot)
 ```
 
 ```{r}
